@@ -107,7 +107,7 @@ Raspberry Pi OS イメージを SD カードへインストールします。
 
 <div style="page-break-before:always"></div>
 
-### 2.3 Raspberry Pi OSイメージをSDに書き込み（インストール）
+### 2.1 Raspberry Pi OSイメージをSDに書き込み（インストール）
 
 1. **Raspberry Pi Imager for Windows** を https://downloads.raspberrypi.org/imager/imager_latest.exe からダウンロード
 
@@ -163,9 +163,9 @@ Raspberry Pi OS イメージを SD カードへインストールします。
 
 <div style="page-break-before:always"></div>
 
-## iPhoneの設定変更
+## 3. iPhoneの設定変更
 
-### インターネット共有時のSSIDの変更
+### 3.1 インターネット共有時のSSIDの変更
 
 iPhoneではインターネット共有時のSSIDがデフォルトでは `○○のiPhone` となっており、SSIDに日本語が含まれている。
 
@@ -192,7 +192,7 @@ SSIDはiPhoneの名前と同一であるため、iPhoneの名前を一時的に�
 
    <img src="raspi-k8s-training-materials_r1.assets/image-20210727174221045.png" alt="image-20210727174221045" style="zoom:50%;" /> <img src="raspi-k8s-training-materials_r1.assets/image-20210727174453586.png" alt="image-20210727174453586" style="zoom:50%;" />
 
-### iPhoneのインターネット共有を有効化
+### 3.2 iPhoneのインターネット共有を有効化
 
 1. ホーム画面から[設定]を開く
 
@@ -208,19 +208,19 @@ SSIDはiPhoneの名前と同一であるため、iPhoneの名前を一時的に�
 
 
 
-## 3. OS(Raspberry Pi OS)設定
+## 4. OS(Raspberry Pi OS)設定
 
 Raspberry Pi OS インストール後、OS の初期設定を実施します。  
-**なお、3.1から3.8までの手順はすべてのノードで実行してください**
+**なお、4.1から4.10までの手順はすべてのノードで実行してください**
 
 以下はOSの初期設定後のイメージ図です。
 
 ![第3章完了時点のイメージ図](raspi-k8s-training-materials_r1.assets/chapter3.png)
 
-第3章の手順完了後、各ノードははiPhoneを介してインターネットに接続できるようになります。
+第4章の手順完了後、各ノードははiPhoneを介してインターネットに接続できるようになります。
 また、以降の手順のためにホスト名やユーザ名などOSの各種設定を変更します。
 
-### 3.1 キーボードレイアウト変更
+### 4.1 キーボードレイアウト変更
 
 キーボードのレイアウトを日本語に変更します。
 
@@ -236,7 +236,7 @@ Raspberry Pi OS インストール後、OS の初期設定を実施します。
 10. `The default for the keyboard layout`を選択
 11. `No compose key`を選択
 
-### 3.2 タイムゾーン変更
+### 4.2 タイムゾーン変更
 
 タイムゾーンを日本(`Asia/Tokyo`)に変更します。
 
@@ -246,7 +246,7 @@ Raspberry Pi OS インストール後、OS の初期設定を実施します。
 5. `Tokyo`を選択
 6. `<Finish>`を選択
 
-### ハードウェアとOSの確認
+### 4.3 ハードウェアとOSの確認
 
 ```bash
 # Raspberry Piのモデルを確認（個体によってはRev 1.2ではない場合もある）
@@ -264,7 +264,7 @@ Codename:       buster
 
 
 
-### 3.4 ユーザ名とパスワードの変更
+### 4.4 ユーザ名とパスワードの変更
 
 Raspberry Piは初期ユーザ/初期パスワードが決まっており、初期ユーザ/初期パスワードのままで運用しているとよくサイバー攻撃の対象となります。そのため、本演習でもユーザ名とパスワードを変更することで、初期ユーザ/初期パスワードを無効化しています。
 本演習では作業の簡素化と統一のためパスワードは極めて簡易なものに設定していますが、本来であればより複雑なパスワードにしたり、公開鍵認証のみ設定したりする方が良いでしょう。
@@ -360,7 +360,7 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
     $ sudo reboot
     ```
 
-### 3.5 Hostname変更
+### 4.5 Hostname変更
 
 本研修ではMasterノード1台、Workerノード2台の構成で構築するので、各ノードがどの役割なのか識別できるようHostnameを変更します。
 
@@ -377,7 +377,7 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
 8. `<Finish>`を選択
 9. Rebootの確認が表示されるので、`<Yes>`を選択
 
-### 3.3 swapの無効化
+### 4.6 swapの無効化
 
 スワップが有効だと kubelet が起動しないので無効化します。
 
@@ -391,7 +391,7 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
     $ sudo systemctl disable dphys-swapfile.service
     ```
 
-### cgroupsのmemoryサブシステムの有効化
+### 4.7 cgroupsのmemoryサブシステムの有効化
 
 1. memoryサブシステムが有効化されているか確認
 
@@ -431,9 +431,9 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
    memory 1
    ```
 
-### 3.6 Wi-Fi接続とIPアドレス固定化
+### 4.8 Wi-Fi接続とIPアドレス固定化
 
-#### 3.6.1 iPhoneのインターネット共有の設定を確認
+#### 4.8.1 iPhoneのインターネット共有の設定を確認
 
 1. ホーム画面から[設定]を開く
    
@@ -449,7 +449,7 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
 
    <img src="raspi-k8s-training-materials_r1.assets/image-20210727180242379.png" alt="image-20210727180242379" style="zoom:50%;" /> 
 
-#### 3.6.3 Wi-Fiへの接続とIPアドレスの固定化
+#### 4.8.2 Wi-Fiへの接続とIPアドレスの固定化
 
 1. Username: `tarte`, Password: `tarte`でログイン
 
@@ -523,14 +523,14 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
     
     iPhoneのインターネット共有が有効化しているのに、Raspberry Piがインターネット接続できない場合はRaspberry Piを再起動してみること。
 
-### 3.7 パッケージの更新
+### 4.9 パッケージの更新
 
 ```bash
 $ sudo apt update
 $ sudo apt upgrade -y
 ```
 
-### 3.8 SSH サービス起動設定
+### 4.10 SSH サービス起動設定
 
 1. Raspberry Pi起動時にSSHサービスが起動されるように設定
 
@@ -550,23 +550,23 @@ $ sudo apt upgrade -y
    ```
 
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
-※※ **3.1 から 3.8** までの作業は3台分(Master:1台、Worker:2台) 実施ください ※※ 
+※※ **4.1 から 4.10** までの作業は3台分(Master:1台、Worker:2台) 実施ください ※※ 
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
 
 <div style="page-break-before:always"></div>
 
-## 4. Kubernetes のインストール／設定
+## 5. Kubernetes のインストール／設定
 
 Kubernetesのインストールと各種設定を行います。
 以下はKubernetesインストール・各種設定後のイメージです。
 
 ![chapter4](raspi-k8s-training-materials_r1.assets/chapter4-16274513114682.png)
 
-第4章の手順が完了した時点で、Kubernetesとして機能する基本的なクラスタが完成します。
+第5章の手順が完了した時点で、Kubernetesとして機能する基本的なクラスタが完成します。
 
-**4.1 - 4.2の作業はすべてのノードで実施してください。**
+**5.1 - 5.2の作業はすべてのノードで実施してください。**
 
-また、3章までの設定が完了したことで各ノード同士はSSHでアクセスできるようになっています。
+また、4章までの設定が完了したことで各ノード同士はSSHでアクセスできるようになっています。
 ディスプレイやキーボードの抜き差しが面倒であれば、以降はSSHで各ノードを切り替えて作業を実施しても構いません。
 SSHでノードを切り替える場合は操作対象を間違えないように、プロンプトに表示されるHostnameを確認するなど注意しましょう。
 
@@ -601,7 +601,7 @@ ECDSA key fingerprint is SHA256:8aCrchTAadVjjK50I+PiV85T7Jh6FpFs1VBjpUj307E.
 Are you sure you want to continue connecting (yes/no)? <yesを入力>
 ````
 
-### 4.1 Dockerのインストール
+### 5.1 Dockerのインストール
 
 Kubernetesで使用するコンテナランタイムとして、Dockerをインストールします。
 
@@ -622,7 +622,7 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    Docker version 20.10.7, build f0df350
    ```
 
-### 4.2 kubeadm, kubectl, kubeletのインストール
+### 5.2 kubeadm, kubectl, kubeletのインストール
 
 手順は https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/ を参考にしている。
 
@@ -680,10 +680,10 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    ```
 
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※  
-※※　**4.2** までの作業は3台分(Master:1台、Worker:2台)実施ください　※※  
+※※　**5.2** までの作業は3台分(Master:1台、Worker:2台)実施ください　※※  
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※  
 
-### 4.3 Kubernetesクラスタの構築
+### 5.3 Kubernetesクラスタの構築
 
 以降は手順の最初に明記されたノードで作業を実施すること。
 
@@ -881,7 +881,7 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
     raspi-k8s-worker02   Ready    worker                 27m   v1.21.3
     ```
 
-### 4.4 （おまけ）各コマンドの補完機能の有効化
+### 5.4 （おまけ）各コマンドの補完機能の有効化
 
 各コマンドの保管機能を有効にすることで、コマンド入力中にTabキーで入力を保管できるようになります。
 
@@ -912,13 +912,13 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    $ source ~/.profile
    ```
 
-## 5. Ingressの有効化
+## 6. Ingressの有効化
 
 Ingressを有効化することで、クラスタ外部からのアクセスやトラフィック制御、ロードバランスなどが可能になります。
 
 以降の作業はMasterノードで実施してください。
 
-### 5.1 Nginx Ingress Controllerのデプロイ
+### 6.1 Nginx Ingress Controllerのデプロイ
 
 1. MasterにもPodをスケジュールできるように変更
 
@@ -951,7 +951,7 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
    ingress-nginx-controller-55bc4f5565-p2mh4   1/1     Running     0          2m15s
    ```
 
-### 5.2 Ingressの動作確認
+### 6.2 Ingressの動作確認
 
 今回はApacheとnginxという2種類のWebサーバをコンテナとして起動し、Ingressを用いてL7 LoadBalancingすることを想定しています。
 
@@ -1134,9 +1134,9 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
 
 <div style="page-break-before:always"></div>
 
-## 6. k8sクラスタのメトリクス表示
+## 7. k8sクラスタのメトリクス表示
 
-### 6.1 3.5インチディスプレイの設定(Masterのみ)
+### 7.1 3.5インチディスプレイの設定(Masterのみ)
 
 本作業はMasterのみ実施する
 
@@ -1201,7 +1201,7 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
      # コマンド実行後に再起動され、HDMIディスプレイ側で起動表示されます
      ```
 
-### 6.2 metrics-serverの追加
+### 7.2 metrics-serverの追加
 
 デフォルトの状態ではKubernetesクラスタのメトリクスを取得することができないため、metrics-serverをデプロイする。
 metrics-serverをデプロイすることで、`kubectl top`コマンドを用いてKubernetesクラスタのメトリクスを収集できるようになる。
@@ -1282,7 +1282,7 @@ metrics-serverをデプロイすることで、`kubectl top`コマンドを用�
    error: metrics not available yet
    ```
 
-### 6.3 ディスプレイにメトリクスを表示する
+### 7.3 ディスプレイにメトリクスを表示する
 
 SamplerというOSSを用いて、Masterに接続したディスプレイにKuberntesクラスタのメトリクスを表示できるようにする。
 
