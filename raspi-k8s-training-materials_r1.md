@@ -49,7 +49,8 @@
 ## はじめに、、、
 
 本日の研修で、完成するクラスタを紹介します！！
-![raspi1](./raspi-1.png) 　
+
+![raspi-1](raspi-k8s-training-materials_r1.assets/raspi-1.png)
 
 ## 1. ハードウェア組み立て
 
