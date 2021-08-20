@@ -1007,7 +1007,6 @@ Kubernetesクラスタを構築していきます。
     node/raspi-k8s-master untainted
     ```
 
-    
 
 以上でKubernetesクラスタの構築は完了です。
 
@@ -1104,7 +1103,8 @@ Kubernetesは命令的な操作も可能ですが、内部ではIaCで管理さ�
    手入力が面倒な場合は、以下のディレクトリにあるマニフェストを使用してください。
 
    ```bash
-   $ ls -l ~/raspi-k8s-training/4.2/apache-deploy.yaml
+   $ ls -l ~/raspi-k8s-training/manifests/4.2/apache-deploy.yaml
+   $ cp ~/raspi-k8s-training/manifests/4.2/apache-deploy.yaml ~/apache-deploy.yaml
    ```
 
    
@@ -1294,9 +1294,10 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
    # 行頭に+がついている行が apache-deploy-autoheal.yamlで追加された行
    # デフォルトだとノードに障害が発生してから5分経過しないとPodが退避しないので、
    # 今回はわかりやすいようにその時間を10秒にしている。
-   $ diff -u apachce-deploy.yaml apache-deploy-autoheal.yaml
-   --- apache-deploy.yaml  2021-08-19 10:20:24.647078676 +0900
-   +++ apache-deploy-autoheal.yaml 2021-08-19 10:19:30.723446276 +0900
+   $ cd ~/raspi-k8s-training/manifests/
+   $ diff -u ./4.2/apachce-deploy.yaml ./4.4/apache-deploy-autoheal.yaml
+   --- ./4.2/apachce-deploy.yaml  2021-08-19 10:20:24.647078676 +0900
+   +++  ./4.4/apache-deploy-autoheal.yaml 2021-08-19 10:19:30.723446276 +0900
    @@ -20,4 +20,13 @@
             image: httpd:alpine
             ports:
@@ -1312,7 +1313,7 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
    +        tolerationSeconds: 10
    
    # tolerationsの設定を追加
-   $ kubectl apply -f aaaaa/apache-deploy-autoheal.yaml
+   $ kubectl apply -f  ./4.4/apache-deploy-autoheal.yaml
    deployment.apps/apache configured
    ```
 
@@ -1450,7 +1451,8 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
 
    ```bash
    # Apacheのマニフェストを確認
-   $ curl https://raw.githubusercontent.com/senimagan/raspi-k8s-training/main/manifests/5.2/apache.yaml
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/apache.yaml
    ---
    apiVersion: v1
    kind: Service
@@ -1502,14 +1504,15 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    ```
 
    ```bash
-   $ kubectl apply -f https://raw.githubusercontent.com/senimagan/raspi-k8s-training/main/manifests/5.2/apache.yaml
+   $ kubectl apply -f ./4.5/apache.yaml
    ```
 
 2. nginxをデプロイ
 
    ```bash
    # nginxのマニフェストを確認
-   $ curl https://raw.githubusercontent.com/senimagan/raspi-k8s-training/main/manifests/5.2/nginx.yaml
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/nginx.yaml
    ---
    apiVersion: v1
    kind: Service
@@ -1561,7 +1564,7 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    ```
 
    ```bash
-   $ kubectl apply -f https://raw.githubusercontent.com/senimagan/raspi-k8s-training/main/manifests/5.2/nginx.yaml
+   $ kubectl apply -f ./4.5/nginx.yaml
    ```
 
 3. ApacheとnginxのPodがReadyになるまで待機
@@ -1629,7 +1632,8 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
 
    ```bash
    # Ingressのマニフェストを確認
-   $ curl https://raw.githubusercontent.com/senimagan/raspi-k8s-training/main/manifests/5.2/ingress-test.yaml
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/ingress-test.yaml
    apiVersion: extensions/v1beta1
    kind: Ingress
    metadata:
@@ -1649,7 +1653,7 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
    ```
 
    ```bash
-   $ kubectl apply -f https://raw.githubusercontent.com/senimagan/raspi-k8s-training/main/manifests/5.2/ingress-test.yaml
+   $ kubectl apply -f ./4.5/ingress-test.yaml
    ```
 
 4. Nginx Ingress ControllerのNodePort Serviceを確認
@@ -1705,49 +1709,11 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
    Erro from server (NotFound): the server could not find the requested resource (get services http:heapster:)
    ```
 
-2. (Master) metrics-serverをclone
+2. (Master) metrics-serverをデプロイ
 
    ```bash
-   $ git clone https://github.com/kubernetes-sigs/metrics-server.git
-   ```
-
-3. (Master) Arm用にマニフェストを変更
-
-   `metrics-server/manifests/base/deployment.yaml`
-
-   ```diff
-   ...省略...
-   apiVersion: apps/v1
-   kind: Deployment
-   metadata:
-     name: metrics-server
-     ...省略...
-   spec:
-     ...省略...
-     template:
-       ...省略...
-       spec:
-         ...省略...
-         containers:
-         - name: metrics-server
-           image: gcr.io/k8s-staging-metrics-server/metrics-server:master
-           ...省略...
-           args:
-           - --cert-dir=/tmp
-           - --secure-port=4443
-           - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
-           - --kubelet-use-node-status-port
-   +       - --kubelet-insecure-tls
-           ...
-         nodeSelector:
-           kubernetes.io/os: linux
-   +       kubernetes.io/arch: "arm"
-   ```
-
-4. (Master) metrics-serverをデプロイ
-
-   ```bash
-   $ kubectl apply -f metrics-server/manifests/base/
+   $ cd ~/raspi-k8s-training/manifests/
+   $ kubectl apply -f ./4.6/metrics-server/manifests/base/
    ```
 
 5. (Master) metrics-serverが正常にデプロイされたことを確認
@@ -1806,93 +1772,12 @@ SamplerというOSSを用いて、Masterに接続したディスプレイにKube
    $ sudo mv ~/sampler/sampler /usr/bin
    ```
 
-5. (Master) samplerの設定ファイルを作成
+5. (Master) samplerの設定ファイルをコピー
 
    ```bash
-   $ sudo mkdir /etc/sampler$ sudo vi /etc/sampler/k8s.yaml
-   ```
-
-   ```yaml
-   gauges:
-   - title: raspi-k8s-master CPU
-     position: [[0, 0], [40, 6]]
-     rate-ms: 30000
-     color: 10
-     percent-only: true
-     cur:
-       sample: cat /tmp/kube-node | grep raspi-k8s-master | awk '{print $3}' | tr -d "%"
-     max:
-       sample: echo 100
-     min:
-       sample: echo 0
-   - title: raspi-k8s-worker01 CPU
-     position: [[0, 7], [40, 6]]
-     rate-ms: 30000
-     color: 13
-     percent-only: true
-     cur:
-       sample: cat /tmp/kube-node | grep raspi-k8s-worker01 | awk '{print $3}' | tr -d "%"
-     max:
-       sample: echo 100
-     min:
-       sample: echo 0
-   - title: raspi-k8s-worker02 CPU
-     position: [[0, 13], [40, 6]]
-     rate-ms: 30000
-     color: 14
-     percent-only: true
-     cur:
-       sample: cat /tmp/kube-node | grep raspi-k8s-worker02 | awk '{print $3}' | tr -d "%"
-     max:
-       sample: echo 100
-     min:
-       sample: echo 0
-   - title: raspi-k8s-master Mem
-     position: [[40, 0], [40, 6]]
-     rate-ms: 30000
-     color: 10
-     cur:
-       sample: cat /tmp/kube-node | grep raspi-k8s-master | awk '{print $4}' | tr -d "Mi"
-     max:
-       sample: echo 4096
-     min:
-       sample: echo 0
-   - title: raspi-k8s-worker01 Mem
-     position: [[40, 7], [40, 6]]
-     rate-ms: 30000
-     color: 13
-     cur:
-       sample: cat /tmp/kube-node | grep raspi-k8s-worker01 | awk '{print $4}' | tr -d "Mi"
-     max:
-       sample: echo 4096
-     min:
-       sample: echo 0
-   - title: raspi-k8s-worker02 Mem
-     position: [[40, 13], [40, 6]]
-     rate-ms: 30000
-     color: 14
-     cur:
-       sample: cat /tmp/kube-node | grep raspi-k8s-worker02 | awk '{print $4}' | tr -d "Mi"
-     max:
-       sample: echo 4096
-     min:
-       sample: echo 0
-   textboxes:
-   - title: Status
-     position: [[0, 19], [80, 23]]
-     rate-ms: 30000
-     sample: >-
-       kubectl top node > /tmp/kube-node;
-       kubectl get all --all-namespaces > /tmp/kube-all;
-       echo "Pod:$(cat /tmp/kube-all | grep pod/ | grep 'Running' | wc -l)"
-       "Service:$(cat /tmp/kube-all | grep service/ | wc -l)"
-       "Daemonset:$(cat /tmp/kube-all | grep daemonset.apps/ | wc -l)"
-       "Statefulset:$(cat /tmp/kube-all | grep daemonset.apps/ | wc -l)"
-       "Deployment:$(cat /tmp/kube-all | grep deployment.apps/ | wc -l)"
-       "Replicaset:$(cat /tmp/kube-all | grep replicaset.apps/ | wc -l)";
-       echo "";
-       echo "Service";
-       kubectl get svc --no-headers | grep -v ClusterIP | awk '{print $1, $4, $5}' | column -t;
+   $ sudo mkdir /etc/sampler
+   $ cd ~/raspi-k8s-training/manifests/
+   $ sudo cp ./4.6/sampler/k8s.yaml /etc/sampler/k8s.yaml
    ```
 
 6. (Master) `sampler`を実行し、表示を確認
