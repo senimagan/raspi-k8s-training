@@ -2,114 +2,136 @@
 
 ## 目次
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+[TOC]
 
-<!-- code_chunk_output -->
 
-- [ラズパイでコンテナに触れてみよう](#ラズパイでコンテナに触れてみよう)
-  - [目次](#目次)
-  - [はじめに、、、](#はじめに)
-  - [1. ハードウェア組み立て](#1-ハードウェア組み立て)
-    - [1.1 必要な機材の確認](#11-必要な機材の確認)
-      - [各チームで必要な機材](#各チームで必要な機材)
-      - [共有可能な機材（1台のみあれば問題なし）](#共有可能な機材1台のみあれば問題なし)
-    - [1.2 組み立て](#12-組み立て)
-  - [2. OS(Raspberry Pi OS)インストール](#2-osraspberry-pi-osインストール)
-    - [2.1 SDカードの準備](#21-sdカードの準備)
-      - [前提](#前提)
-      - [手順](#手順)
-    - [2.2 Raspberry Pi OSイメージの用意](#22-raspberry-pi-osイメージの用意)
-    - [2.3 Raspberry Pi OSイメージをSDに書き込み（インストール）](#23-raspberry-pi-osイメージをsdに書き込みインストール)
-  - [3. OS(Raspberry Pi OS)設定](#3-osraspberry-pi-os設定)
-    - [3.1 キーボードレイアウト変更](#31-キーボードレイアウト変更)
-    - [3.2 タイムゾーン変更](#32-タイムゾーン変更)
-    - [3.3 swapの無効化](#33-swapの無効化)
-    - [3.4 ユーザ名パスワード変更](#34-ユーザ名パスワード変更)
-    - [3.5 Hostname変更](#35-hostname変更)
-    - [3.6 Wi-Fi接続とIP固定化](#36-wi-fi接続とip固定化)
-    - [3.7 パッケージの更新](#37-パッケージの更新)
-    - [3.8 SSH サービス起動設定](#38-ssh-サービス起動設定)
-  - [4. Kubernetes のインストール／設定](#4-kubernetes-のインストール設定)
-    - [4.1 Dockerのインストール](#41-dockerのインストール)
-    - [4.2 kubeadm, kubectl, kubeletのインストール](#42-kubeadm-kubectl-kubeletのインストール)
-    - [4.3 Kubernetesクラスタの構築](#43-kubernetesクラスタの構築)
-    - [4.4 （おまけ）各コマンドの補完機能の有効化](#44-おまけ各コマンドの補完機能の有効化)
-  - [5. Ingressの有効化](#5-ingressの有効化)
-    - [5.1 Nginx Ingress Controllerのデプロイ](#51-nginx-ingress-controllerのデプロイ)
-    - [5.2 Ingressの動作確認](#52-ingressの動作確認)
-  - [6. k8sクラスタのメトリクス表示](#6-k8sクラスタのメトリクス表示)
-    - [6.1 3.5インチディスプレイの設定(Masterのみ)](#61-35インチディスプレイの設定masterのみ)
-    - [6.2 metrics-serverの追加](#62-metrics-serverの追加)
-    - [6.3 ディスプレイにメトリクスを表示する](#63-ディスプレイにメトリクスを表示する)
-      - [（おまけ）samplerの起動時自動実行設定](#おまけsamplerの起動時自動実行設定)
 
-<!-- /code_chunk_output -->
 <div style="page-break-before:always"></div>
 
-## はじめに、、、
+## はじめに
 
-本日の研修で、完成するクラスタを紹介します！！
+（仮文言）
+
+本研修では、シングルボードコンピュータであるRaspberry Piを用いたKubernetsクラスタの構築を通じて、Kubernetesの仕組みや構築・運用方法をざっくりと理解することを目的としています。
+
+本研修を完了すると以下のようなクラスタが完成します。手順が多く大変ですが、楽しみながら学習していただけると幸いです。
 
 ![raspi-1](raspi-k8s-training-materials_r1.assets/raspi-1.png)
 
-## 1. ハードウェア組み立て
 
-Raspberry Piを開封し、ラックにマウントしケーブル類を接続します。
 
-### 1.1 必要な機材の確認
+### 本研修のスケジュール
 
-#### 各チームで必要な機材
+本研修は以下のスケジュールで進めていただきます。
 
-1. Raspberry Pi × 3
-2. ディスプレイ
-3. USBキーボード
-4. microSDカード × 3
-5. HDMI × microHDMI変換コネクタ
-6. Raspberry Pi 用積層式ケース
-7. Raspberry Pi 専用LCDモニター
-8. ACアダプタ × 3
-9. 充電用TypeCケーブル(USB) × 3
-10. 社用iPhone
-11. 個人SS10端末(ドキュメント参照・調査用)
+```mermaid
+gantt
+dateFormat YYYY/MM/DD
+axisFormat %e日目
+title 教育スケジュール
+todayMarker off
 
-#### 共有可能な機材（1台のみあれば問題なし）
+section 1.準備
+教材到着・確認: crit, active, t1, 2021/01/01, 2d
+資料入手:      crit, active, t2, 2021/01/01, 2d
 
-1. 書込みPC（SDカード書込可能なPC）
+section 2.自主学習
+HW構築・OSインストール・k8s構築(本書の内容の実施): crit, active, t3, 2021/01/03, 11d
+
+section 3.研修・QA
+研修:crit,active,t4,2021/01/14,1d
+
+section 4.教材返却
+返却:crit,active,t5,2021/01/15,2d
+```
+
+通常の研修とは異なり、大部分が自主学習となっています。
+ビデオ通話を用いたハンズオン研修も予定しておりますが、こちらは本書の内容を完了できていない受講者のフォローやトラブルシュートが主な内容となります。
+
+使用した機材は、ハンズオン研修終了後 翌2日以内に同梱されている着払い伝票（ゆうパック）にて返却してください。
+
+
+
+## 1. 事前準備
+
+Kubernetesを構築する前に、必要機材の確認やハードウェアなどの準備を行います。
+
+### 1.1 必要機材の確認
+
+受け取った教材に、以下の機材が同梱されていることを確認してください。
+教材に不備・不足などあった場合は速やかに事務局(managed-paas@sdb.jp.nec.com)までご連絡ください。
+
+| 機材名                                | 個数 | 説明                                                         |
+| ------------------------------------- | ---- | ------------------------------------------------------------ |
+| Raspberry Pi 4 Model B (4GB RAM)      | 3    | サーバとして使用                                             |
+| microSDカード                         | 4    | Raspberry Piのストレージとして使用。<br />OSインストール済み。1枚は予備。 |
+| ACアダプタ                            | 3    | Raspberry Piの電源供給に使用                                 |
+| 充電用USB Type-Cケーブル （3個入）    | 1    | Raspberry Piの電源供給に使用                                 |
+| 電源タップ                            | 1    | Raspberry Piの電源供給に使用                                 |
+| Stackable Acrylic Case                | 1    | Raspberry Pi用の積層ケース                                   |
+| HDMI - microHDMI変換アダプタ          | 1    | Raspberry Piの映像出力をHDMIに変換するために使用             |
+| OSOYOO 3.5" Raspberry Pi Touch Screen | 1    | Raspberry Pi用の小型ディスプレイ                             |
+
+
+
+また、以下の機材については受講者各自でご用意ください。
+
+| 機材名                     | 個数 | 説明                                                     |
+| -------------------------- | ---- | -------------------------------------------------------- |
+| HDMI接続可能なディスプレイ | 1    | Raspberry Piに接続するためのディスプレイ                 |
+| HDMIケーブル               | 1    | Raspberry Piとディスプレイを接続するためのケーブル       |
+| USBキーボード              | 1    | Raspberry Piに接続して使用するためのキーボード           |
+| 社有iPhone                 | 1    | Raspberry Pi同士の接続およびインターネットアクセスに使用 |
+| シンクラ端末(SS10など)     | 1    | 本資料の参照やトラブルシュート時の調査・情報収集に使用   |
 
 <div style="page-break-before:always"></div>
 
-### 1.2 組み立て
+### 1.2 Raspberry Piのラック組み立て
 
-多少機材が異なりますが、以下サイトに組み立て方法が記載されているので参考ください。  
+Raspberry Piと積層ケースを開封しラックを組み立てます。
+
+多少機材が異なりますが、以下サイトを参考に組み立ててください。
 https://developers.cyberagent.co.jp/blog/archives/14721/
 
-以下は組み立て時点のRaspberry Piのイメージ図です。
+下から1段目は空にして、2~4段目にRaspberry Piを配置すると取り回しやすくなります。
+**この時点では小型ディスプレイは接続しないでください。**
+
+以下はmicroSDをセットする前のRaspberry Piのイメージ図です。
 
 ![第1章完了時点のイメージ図](raspi-k8s-training-materials_r1.assets/chapter1-16273583378831.png)
 
-この時点ではRaspberry PiにはOSもインストールされていないので起動しません。
+Raspberry PiはmicroSDにOSがインストールされているため、microSDをセットする前の状態では電源を接続しても起動しません。
 
-## 2. OS(Raspberry Pi OS)インストール
 
-Raspberry Pi OS イメージを SD カードへインストールします。  
-本章では、書込みPC およびSDカード3枚を利用します。  
+
+### 1.2 OSのインストール
+
+---
+
+**教材に同梱されているmicroSDには既にOSをインストールしているため、本章は飛ばして「[1.3 iPhoneの設定変更](#1.3_iPhoneの設定変更)」に進んでください。**
+
+OSインストール済みの予備のmicroSDも同梱しておりますが、OSが起動しなくなったなどの問題があった場合は本章を参照して対応して下さい。
+
+---
+
+Raspberry Pi OS イメージを SD カードへインストールします。  本章では、書込みPC およびSDカード3枚を利用します。  
 
 以下はRaspberry Pi OSをインストールした後のイメージ図です。
 
 ![第2章完了時点のイメージ図](raspi-k8s-training-materials_r1.assets/chapter2.png)
 
-第2章の手順を完了することで、Raspberry Piをコンピュータとして起動できるようになります。
-
-### 前提
-
-- SDカードは購入時の状態であること
-- 書込PCはWindows10であること
+この手順を完了することで、Raspberry Piをコンピュータとして起動できるようになります。
 
 <div style="page-break-before:always"></div>
 
-### 2.1 Raspberry Pi OSイメージをSDに書き込み（インストール）
+#### 前提条件
 
-1. **Raspberry Pi Imager for Windows** を https://downloads.raspberrypi.org/imager/imager_latest.exe からダウンロード
+- 書込PCはWindows10であること
+
+#### 手順
+
+1. **Raspberry Pi Imager for Windows** を以下のURLからダウンロード
+    https://downloads.raspberrypi.org/imager/imager_latest.exe
 
 2. ダウンロードしたEXEを実行し、Raspberry Pi Imager for Windowsをインストール
 
@@ -158,19 +180,25 @@ Raspberry Pi OS イメージを SD カードへインストールします。
    書き込みが完了すると以下のようなメッセージが表示される。
 
    <img src="raspi-k8s-training-materials_r1.assets/image-20210727093524388.png" alt="image-20210727093524388" style="zoom:67%;" />
+   
+   
+   
+10. 書込PCからmicroSDを取り出す
 
-これを3台分実施する。  
+以上の作業を3回繰り返して、OSをインストールしたmicroSDを3つ用意します。
 
 <div style="page-break-before:always"></div>
 
-## 3. iPhoneの設定変更
+### 1.3 iPhoneの設定変更
 
-### 3.1 インターネット共有時のSSIDの変更
+#### 1.3.1 インターネット共有時のSSIDの変更
 
-iPhoneではインターネット共有時のSSIDがデフォルトでは `○○のiPhone` となっており、SSIDに日本語が含まれている。
+iPhoneではインターネット共有時のSSIDがデフォルトでは `○○のiPhone` となっており、SSIDに日本語が含まれている状態になっています。
+Raspberry Piでは日本語を含んだSSIDのWi-Fiには接続できないため、iPhoneのインターネット共有時のSSIDを変更する必要があります。
 
-Raspberry Piでは日本語を含むSSIDのWi-Fiには接続できないため、iPhoneのインターネット共有時のSSIDを変更する。
-SSIDはiPhoneの名前と同一であるため、iPhoneの名前を一時的に変更する。本研修完了後は元に戻してよい。
+SSIDはiPhoneの名前と同一であるため、iPhoneの名前を一時的に変更します。本研修完了後は元に戻してください。
+
+
 
 1. ホーム画面から[設定]を開く
 
@@ -192,7 +220,9 @@ SSIDはiPhoneの名前と同一であるため、iPhoneの名前を一時的に�
 
    <img src="raspi-k8s-training-materials_r1.assets/image-20210727174221045.png" alt="image-20210727174221045" style="zoom:50%;" /> <img src="raspi-k8s-training-materials_r1.assets/image-20210727174453586.png" alt="image-20210727174453586" style="zoom:50%;" />
 
-### 3.2 iPhoneのインターネット共有を有効化
+以上で、インターネット共有時のSSIDの変更は完了。
+
+#### 1.3.2 iPhoneのインターネット共有を有効化
 
 1. ホーム画面から[設定]を開く
 
@@ -206,25 +236,25 @@ SSIDはiPhoneの名前と同一であるため、iPhoneの名前を一時的に�
 
    <img src="raspi-k8s-training-materials_r1.assets/image-20210727180242379.png" alt="image-20210727180242379" style="zoom:50%;" /> 
 
+以上で、インターネット共有の有効化は完了。
 
 
-## 4. OS(Raspberry Pi OS)設定
 
-Raspberry Pi OS インストール後、OS の初期設定を実施します。  
-**なお、4.1から4.10までの手順はすべてのノードで実行してください**
+## 2. OS (Raspberry Pi OS)の設定変更
+
+Hostnameの設定やWi-Fiへの接続などRaspberry Pi OS の初期設定を実施し、Kubernetesクラスタを構築できる状態にします。
+
+**なお、2.1から2.10までの手順は すべてのノード で実行してください**
 
 以下はOSの初期設定後のイメージ図です。
 
 ![第3章完了時点のイメージ図](raspi-k8s-training-materials_r1.assets/chapter3.png)
 
-第4章の手順完了後、各ノードははiPhoneを介してインターネットに接続できるようになります。
-また、以降の手順のためにホスト名やユーザ名などOSの各種設定を変更します。
+### 2.1 キーボードレイアウトの変更
 
-### 4.1 キーボードレイアウト変更
+デフォルトだとキーボードレイアウトが英語配列になっているので、入力しやすいように日本語配列に変更する。
 
-キーボードのレイアウトを日本語に変更します。
-
-1. Raspberry Piにディスプレイ、キーボードを接続し、起動
+1. Raspberry PiにmicroSD、ディスプレイ、キーボードを接続し、起動
 2. Username: `pi`, Password: `raspberry`でログイン
 3. `sudo raspi-config`を実行
 4. `5 Localisation Options`を選択
@@ -236,7 +266,9 @@ Raspberry Pi OS インストール後、OS の初期設定を実施します。
 10. `The default for the keyboard layout`を選択
 11. `No compose key`を選択
 
-### 4.2 タイムゾーン変更
+
+
+### 2.2 タイムゾーンの変更
 
 タイムゾーンを日本(`Asia/Tokyo`)に変更します。
 
@@ -246,7 +278,11 @@ Raspberry Pi OS インストール後、OS の初期設定を実施します。
 5. `Tokyo`を選択
 6. `<Finish>`を選択
 
-### 4.3 ハードウェアとOSの確認
+
+
+### 2.3 ハードウェアとOS、Kernelの確認
+
+今回使用しているハードウェア、OS、Kernelバージョンを確認します。
 
 ```bash
 # Raspberry Piのモデルを確認（個体によってはRev 1.2ではない場合もある）
@@ -260,13 +296,18 @@ Distributor ID: Raspbian
 Description:    Raspbian GNU/Linux 10 (buster)
 Release:        10
 Codename:       buster
+
+# Kernelバージョンを確認
+$ uname -a
+Linux raspberrypi 5.10.52-v71+ #1441 SMP Tue Aug 3 18:11:56 BST 2021 armv71 GNU/Linux
 ```
 
 
 
-### 4.4 ユーザ名とパスワードの変更
+### 2.4 ユーザ名とパスワードの変更
 
-Raspberry Piは初期ユーザ/初期パスワードが決まっており、初期ユーザ/初期パスワードのままで運用しているとよくサイバー攻撃の対象となります。そのため、本演習でもユーザ名とパスワードを変更することで、初期ユーザ/初期パスワードを無効化しています。
+Raspberry Piは初期ユーザ/初期パスワードが決まっており、初期ユーザ/初期パスワードのままで運用しているとよくサイバー攻撃の対象となります。
+そのため、本演習でもユーザ名とパスワードを変更することで、初期ユーザ/初期パスワードを無効化しています。
 本演習では作業の簡素化と統一のためパスワードは極めて簡易なものに設定していますが、本来であればより複雑なパスワードにしたり、公開鍵認証のみ設定したりする方が良いでしょう。
 
 1. 仮ユーザ( `tmp` ユーザ)を作成 
@@ -360,7 +401,9 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
     $ sudo reboot
     ```
 
-### 4.5 Hostname変更
+
+
+### 2.5 Hostnameの変更
 
 本研修ではMasterノード1台、Workerノード2台の構成で構築するので、各ノードがどの役割なのか識別できるようHostnameを変更します。
 
@@ -377,7 +420,9 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
 8. `<Finish>`を選択
 9. Rebootの確認が表示されるので、`<Yes>`を選択
 
-### 4.6 swapの無効化
+
+
+### 2.6 swapの無効化
 
 スワップが有効だと kubelet が起動しないので無効化します。
 
@@ -390,8 +435,17 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
     $ sudo swapoff -a
     $ sudo systemctl disable dphys-swapfile.service
     ```
+    
+3. swapが無効化されていることを確認
 
-### 4.7 cgroupsのmemoryサブシステムの有効化
+    ```bash
+    # 何も表示されなければOK
+    $ sudo swapon --show
+    ```
+
+    
+
+### 2.7 cgroupsのmemoryサブシステムの有効化
 
 1. memoryサブシステムが有効化されているか確認
 
@@ -431,9 +485,14 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
    memory 1
    ```
 
-### 4.8 Wi-Fi接続とIPアドレス固定化
 
-#### 4.8.1 iPhoneのインターネット共有の設定を確認
+
+### 2.8 Wi-Fi接続とIPアドレス固定化
+
+#### 2.8.1 iPhoneのインターネット共有の設定を確認
+
+iPhoneのインターネット共有は接続している端末がない状態がしばらく続くと自動的にOFFになってしまいます。
+本節の設定前にインターネット共有がONになっていることを確認しましょう。
 
 1. ホーム画面から[設定]を開く
    
@@ -449,7 +508,9 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
 
    <img src="raspi-k8s-training-materials_r1.assets/image-20210727180242379.png" alt="image-20210727180242379" style="zoom:50%;" /> 
 
-#### 4.8.2 Wi-Fiへの接続とIPアドレスの固定化
+
+
+#### 2.8.2 Wi-Fiへの接続とIPアドレスの固定化
 
 1. Username: `tarte`, Password: `tarte`でログイン
 
@@ -492,7 +553,7 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
     - "raspi-k8s-worker01"  : 172.20.10.3
     - "raspi-k8s-worker02"  : 172.20.10.4
 
-    ```conf
+    ```bash
     $ cat << EOF >> /etc/dhcpcd.conf
     interface wlan0
     static ip_address=<IP Address>
@@ -503,7 +564,7 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
 
 11. Raspberry Piを再起動
 
-    ```conf
+    ```bash
     $ sudo reboot
     ```
 
@@ -522,15 +583,19 @@ Raspberry Piは初期ユーザ/初期パスワードが決まっており、初�
     - Raspberry PiがiPhoneのインターネット共有に接続できている
     
     iPhoneのインターネット共有が有効化しているのに、Raspberry Piがインターネット接続できない場合はRaspberry Piを再起動してみること。
+    
+    
 
-### 4.9 パッケージの更新
+### 2.9 各種パッケージの更新
 
 ```bash
 $ sudo apt update
 $ sudo apt upgrade -y
 ```
 
-### 4.10 SSH サービス起動設定
+
+
+### 2.10 SSH サービス起動設定
 
 1. Raspberry Pi起動時にSSHサービスが起動されるように設定
 
@@ -549,24 +614,26 @@ $ sudo apt upgrade -y
       Active: active (running) since Wed 2021-07-28 14:44:09 51s ago
    ```
 
-※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
-※※ **4.1 から 4.10** までの作業は3台分(Master:1台、Worker:2台) 実施ください ※※ 
-※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+
+
+※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+※※  **2.1 から 2.10** までの作業は3台分(Master:1台、Worker:2台) 実施ください  ※※ 
+※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
 
 <div style="page-break-before:always"></div>
 
-## 5. Kubernetes のインストール／設定
+## 3. Kubernetesクラスタの構築／初期設定
 
-Kubernetesのインストールと各種設定を行います。
-以下はKubernetesインストール・各種設定後のイメージです。
+ここからKubernetesクラスタの構築と初期設定を行います。
+以下はKubernetesクラスタ構築および設定後のイメージです。
 
 ![chapter4](raspi-k8s-training-materials_r1.assets/chapter4-16274513114682.png)
 
-第5章の手順が完了した時点で、Kubernetesとして機能する基本的なクラスタが完成します。
+第3章の手順が完了した時点で、Kubernetesとして機能する基本的なクラスタが完成します。
 
-**5.1 - 5.2の作業はすべてのノードで実施してください。**
+**3.1 - 3.2の作業はすべてのノードで実施してください。**
 
-また、4章までの設定が完了したことで各ノード同士はSSHでアクセスできるようになっています。
+また、OSの設定が完了したことで各ノード同士はSSHでアクセスできるようになっています。
 ディスプレイやキーボードの抜き差しが面倒であれば、以降はSSHで各ノードを切り替えて作業を実施しても構いません。
 SSHでノードを切り替える場合は操作対象を間違えないように、プロンプトに表示されるHostnameを確認するなど注意しましょう。
 
@@ -601,20 +668,25 @@ ECDSA key fingerprint is SHA256:8aCrchTAadVjjK50I+PiV85T7Jh6FpFs1VBjpUj307E.
 Are you sure you want to continue connecting (yes/no)? <yesを入力>
 ````
 
-### 5.1 Dockerのインストール
+### 3.1 コンテナランタイム(docker)のインストール
 
-Kubernetesで使用するコンテナランタイムとして、Dockerをインストールします。
+コンテナランタイムとは、簡単に言えばコンテナを操作・管理するために必要なソフトウェアです。
+Kubernetesはコンテナランタイムを介して各種コンテナをオーケストレーションしています。
 
-1. Dockerをインストール
+Kubernetesは、[docker](https://www.docker.com/),  [containerd](https://containerd.io/), [cri-o](https://cri-o.io/) といったコンテナランタイムをサポートしています。
+
+本研修ではコンテナランタイムとして docker をインストールしていきます。
+
+1. `docker` をインストール
 
    ```bash
-   # Dockerをインストール
+   # dockerをインストール
    $ curl -sSL https://get.docker.com | sh
    # tarteユーザでDockerを実行できるよう、dockerグループに追加
    $ sudo usermod -aG docker tarte
    ```
 
-2. Dockerがインストールされたことを確認
+2. `docker` がインストールされたことを確認
 
    ```bash
    # 以下の出力は例であるため、実際の出力とは異なる場合がある
@@ -622,17 +694,17 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    Docker version 20.10.7, build f0df350
    ```
 
-### 5.2 kubeadm, kubectl, kubeletのインストール
+### 3.2 kubeadm, kubectl, kubeletのインストール
 
-手順は https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/ を参考にしている。
+Kubernetesの構築・運用に必要なパッケージをインストールします。
 
-1. iptablesのバックエンドとしてnftablesを使用しないように変更
+1. `iptables`のバックエンドとして`nftables`を使用しないように変更
 
-   Raspberry Pi OSでは、デフォルトでiptablesのバックエンドにnftablesを使用しています。
-   一方で、Kubernetes 1.18以前はnftablesに対応していないので、iptablesのバックエンドとしてiptablesが動作している必要があります。
+   Raspberry Pi OSでは、デフォルトで`iptables`のバックエンドに`nftables`を使用しています。
+   しかし、Kubernetesは`nftables`に対応していないので、`iptables`のレガシーバージョンが動作するように切り替える必要があります。
 
    ```bash
-   # レガシーバイナリをインストール
+   # iptablesnのレガシーバイナリをインストール
    $ sudo apt install -y iptables arptables ebtables
 
    # iptablesのバックエンドとして、iptablesが動作するように変更
@@ -642,32 +714,31 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    $ sudo update-alternatives --set ebtables /usr/sbin/ebtables-legacy
    ```
 
-2. kubeadm, kubelet, kubectlをインストール
+2. `kubeadm`, `kubelet`, `kubectl`をインストール
 
    ```bash
    # 鍵登録
    $ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
    sudo apt-key add -
    
-   # apt のソースリストに Kubernetes を提供しているリポジトリ設定
+   # apt のソースリストに Kubernetes関連のパッケージを提供しているリポジトリを追加
    $ cat << EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-   deb https://apt.kubernetes.io/ kubernetes-xenial main
+   deb https://apt.kubernetes.io/  kubernetes-xenial main
    EOF
    
    # apt を更新し、Kubernetesのモジュールの情報を取得
    $ sudo apt update
    
-   # Kubernetes の各モジュールをインストール
-   $ sudo apt install -y kubelet kubeadm kubectl
+   # Kubernetes の各パッケージをインストール
+   $ sudo apt install -y kubelet=1.21.3-00 kubeadm=1.21.3-00 kubectl=1.21.3-00
    
    # kubelet kubeadm kubectlのバージョンを固定
    $ sudo apt-mark hold kubelet kubeadm kubectl
    ```
    
-3. kubelet、kubeadm、kubectl がインストールされたことを確認
+3. `kubeadm`, `kubelet`, `kubectl` がインストールされたことを確認
 
    ```bash
-   # 以下の出力は例なので、実際の出力とは異なる場合がある
    # kubelet バージョン確認
    $ kubelet --version
    Kubernetes v1.21.3
@@ -678,14 +749,54 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    $ kubectl version --short --client
    Client Version: v1.21.3
    ```
+   
 
-※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※  
-※※　**5.2** までの作業は3台分(Master:1台、Worker:2台)実施ください　※※  
-※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※  
 
-### 5.3 Kubernetesクラスタの構築
 
-以降は手順の最初に明記されたノードで作業を実施すること。
+### 3.3 コマンドの補完機能の有効化
+
+`kubectl` と `kubeadm` の補完機能を有効化します。補完機能を有効にすることで、コマンド入力中にTabキーで入力を補完できるようになります。
+
+1. 補完コードをファイルに出力
+
+   ```bash
+   $ kubectl completion bash > ~/.kube/kubectl_completion.bash.inc
+   
+   $ kubeadm completion bash > ~/.kube/kubeadm_completion.bash.inc
+   ```
+
+2. 補完コードのファイルを`.profile`で読み込むように変更
+
+   Raspberry Pi上では $\backslash$ (半角バックスラッシュ) と $￥$ (半角円記号)が区別されることに注意すること。
+   以下のコマンドで使用しているのはバックスラッシュである。
+
+   ```bash
+   $ printf "\n# Kubectl shell completion
+   source ~/.kube/kubectl_completion.bash.inc\n" >> ~/.profile
+   
+   $ printf "\n# Kubeadm shell completion
+   source ~/.kube/kubeadm_completion.bash.inc\n" >> ~/.profile
+   ```
+
+3. ノードを再起動
+
+   ```bash
+   $ sudo reboot
+   ```
+
+
+
+※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+※※　**3.3** までの作業は3台分(Master:1台、Worker:2台)実施ください　※※
+※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
+
+<div style="page-break-before:always"></div>
+
+### 3.4 Kubernetesクラスタの構築
+
+Kubernetesクラスタを構築していきます。
+
+以降の手順では、文頭に明記されたノードで作業を実施してください。
 
 1. (Master) Masterノードを初期化
 
@@ -714,7 +825,7 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    
    Then you can join any number of worker nodes by running the following on each as root:
    kubeadm join 172.20.10.2:6443 --token 1gettp.t0tchwj82mg2qfbq \
-    --discovery-token-ca-cert-hash sha256:c4d3698d75c1584e78a27d4e0e2755fd79f3c78bebbe05dddf698fb4095a3ca2
+    --discovery-token-ca-cert-hash sha256:2608eeb6840cde591b744ee0a3ecbe8d9278096a730f91d26c4e47d3d0788ebb2
    ```
 
 2. (Master) tokenをファイルに出力
@@ -752,7 +863,10 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    $ scp  ~/token ~/ca-cert-hash tarte@raspi-k8s-worker02.local:/home/tarte/
    ```
 
-5. (Master) kubectlを実行できるように設定
+5. (Master) `kubectl` の設定ファイルをコピー
+
+   `kubectl` でクラスタにアクセスして各種操作を実行するには認証情報を含んだ設定ファイルが必要になります。
+   `kubeadm init` が完了すると設定ファイルが生成されるので、それを所定のディレクトリ(`~/.kube/`)にコピーします。
 
    ```bash
    $ mkdir -p ~/.kube
@@ -760,43 +874,43 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    $ sudo chown $(id -u):$(id -g) ~/.kube/config
    ```
 
-   `~/.kube` 配下に config ファイルがコピーされていること、所有者とグループが tarteになっていることを確認  
+   `~/.kube` 配下に config ファイルがコピーされていること、所有者とグループが `tarte`になっていることを確認します。
 
    ```bash
    $ ls -l ~/.kube/config
    -rw------- 1 tarte tarte 5595 Jul 29 10:24 /home/tarte/.kube/config
    ```
 
-6. (Master) kubectlを実行できることを確認
+6. (Master) `kubectl` でリソースの情報を取得できることを確認
 
    ```bash
-   # この時点ではMasterノードはNotReady
+   # この時点ではMasterノードはNotReadyのまま
    $ kubectl get node
    NAME                STATUS      ROLES                  AGE    VERSION
    raspi-k8s-master    NotReady    control-plane,master   36m    v1.21.3
    ```
 
-7. (Master) コンテナ間通信を実現するflannelを構築
+7. (Master) コンテナ間通信を実現する flannel をデプロイ
 
-   flannelはコンテナ間通信を実現するためのContainer Network Interface(CNI)です。
+   flannel はコンテナ間通信を実現するためのContainer Network Interface(CNI)です。
    Kubernetesは様々なPod（コンテナ）が連携して動作しています。
-   そのため、flannelなどのCNIを構築するまではコンテナ同士の通信ができない（＝コンテナが連携できない）ので、`raspi-k8s-master`が `NotReady`となっています。
+   そのため、flannel などのCNIを構築するまではコンテナ同士の通信ができない（＝コンテナが連携できない）ので、`raspi-k8s-master`が **NotReady**となっています。
 
-   flannel構築後のネットワーク図は以下のようになっています。
+   flannel デプロイ後のネットワーク図は以下のようになっています。
 
    ![flannelのアーキテクチャ](raspi-k8s-training-materials_r1.assets/flannel_architecture.png)
 
-   以下のコマンドを実行することで、flannelを構築することができる。
+   以下のコマンドを実行することで、flannelをデプロイすることができます。
 
    ```bash
    $ kubectl apply -f \
    https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
    ```
 
-8. (Master) すべてのPodがReadyになることを確認
+8. (Master) すべてのPodが **Ready** になることを確認
 
-   下記コマンドを実行すると、すべてのPodがReadyになるまで待機します。
-   すべてのPodがReadyになるとコマンドが完了し、プロンプトが返ってきます。
+   下記コマンドを実行すると、すべてのPodが **Ready** になるまで待機します。
+   すべてのPodが **Ready** になるとコマンドが完了し、プロンプトが返ってきます。
 
    ```bash
    # すべてのPodがReadyになるまで待機
@@ -812,7 +926,7 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    pod/kube-scheduler-raspi-k8s-master condition met
    ```
 
-9. (Master) MasterノードがReadyになっていることを確認
+9. (Master) Masterノードが` **Ready** `になっていることを確認
 
    ```bash
    # この時点ではMasterノードがReadyになる
@@ -821,29 +935,29 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
    raspi-k8s-master    Ready     master    12m   v1.21.3
    ```
 
-10. (Worker01, Worker02) `kubeadm join`を実行し、k8sクラスタに参加
+10. (Worker01, Worker02) `kubeadm join`を実行し、Kubernetesクラスタに参加
 
-   ```bash
-   $ sudo kubeadm join 172.20.10.2:6443 --token $(cat ~/token) \
-   --discovery-token-ca-cert-hash sha256:$(cat ~/ca-cert-hash)
-   ```
+    **Worker01とWorker02のそれぞれで実行してください**
 
-   以下のようなメッセージが表示されることを確認
+    ```bash
+    $ sudo kubeadm join 172.20.10.2:6443 --token $(cat ~/token) \
+    --discovery-token-ca-cert-hash sha256:$(cat ~/ca-cert-hash)
+    ```
 
-   ```bash
-   This node has joined the cluster:
-   * Certificate signing request was sent to apiserver and a response was received.
-   * The Kubelet was informed of the new secure connection details.
-   
-   Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
-   ```
+    以下のようなメッセージが表示されることを確認
 
-   
+    ```bash
+    This node has joined the cluster:
+    * Certificate signing request was sent to apiserver and a response was received.
+    * The Kubelet was informed of the new secure connection details.
+    
+    Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
+    ```
 
-11. (Master) worker01, worker02がReadyになることを確認
+11. (Master) Worker01, Worker02が **Ready** になることを確認
 
-    下記コマンドを実行すると、すべてのWorkerノードがReadyになるまで待機します。
-    すべてのWorkerノードがReadyになるとコマンドが完了し、プロンプトが返ってきます。
+    下記コマンドを実行すると、すべてのWorkerノードが **Ready** になるまで待機します。
+    すべてのWorkerノードが **Ready** になるとコマンドが完了し、プロンプトが返ってきます。
 
     ```bash
     # すべてのWorkerノードがReadyになるまで待機
@@ -874,86 +988,463 @@ Kubernetesで使用するコンテナランタイムとして、Dockerをイン�
     役割を表すラベルを付与すると、ROLES列に役割が表示されるようになる。
 
     ```bash
-    $ kubeactl get node
+    $ kubectl get node
     NAME                 STATUS   ROLES                  AGE   VERSION
     raspi-k8s-master     Ready    control-plane,master   64m   v1.21.3
     raspi-k8s-worker01   Ready    worker                 30m   v1.21.3
     raspi-k8s-worker02   Ready    worker                 27m   v1.21.3
     ```
 
-### 5.4 （おまけ）各コマンドの補完機能の有効化
+14. (Master) MasterにもPodをスケジュールできるように変更
 
-各コマンドの保管機能を有効にすることで、コマンド入力中にTabキーで入力を保管できるようになります。
+    通常、Masterノードには特別なPodしかスケジュールできないようになっています。
+    しかし、Raspberry Piでは使用できるリソースが少なく、Workerノード2台だけだとリソース不足になる可能性があります。
 
-1. (Master) 補完コードをファイルに出力
+    そこで 3台のRaspberry Piのリソースを最大限利用するために、MasterノードにもPodをスケジュールできるように変更します。
+
+    ```bash
+    $ kubectl taint nodes  raspi-k8s-master node-role.kubernetes.io/master-
+    node/raspi-k8s-master untainted
+    ```
+
+    
+
+以上でKubernetesクラスタの構築は完了です。
+
+<div style="page-break-before:always"></div>
+
+## 4. Kubernetesクラスタを運用しよう
+
+ここからは、構築したKuebernetesクラスタを用いて、Kubernetesの初歩的な運用や動きについて体験しましょう。
+
+以降の手順では、Masterノード(`raspi-k8s-master`)でコマンドを実行していきます。
+
+### 4.1 事前準備
+
+以降の手順ではマニフェストと呼ばれるテキストファイルを作成したり編集したりします。
+
+ただ、Raspberry Piの環境ですべて手入力するのは大変なので、以降の手順で使用するマニフェストはすべてGitHubに公開しています。
+
+まずは必要なコマンドやファイルをダウンロードしていきましょう。
+
+1. `git`コマンドのインストール
 
    ```bash
-   $ kubectl completion bash > ~/.kube/kubectl_completion.bash.inc
+   $ sudo apt intall -y git
+   ```
+
+2. Masterノードを再起動
+
+   ```bash
+   $ sudo reboot
+   ```
+
+3. MasterノードにUsername: `tarte`, Password: `tarte`でログイン
+
+4. 必要なファイルをダウンロード
+
+   ```bash
+   $ git clone https://github.com/senimagan/raspi-k8s-training.git
+   ```
+
+5. 必要なファイルがダウンロードできていることを確認
+
+   ```bash
+   $ ls -l raspi-k8s-training
    
-   $ kubeadm completion bash > ~/.kube/kubeadm_completion.bash.inc
    ```
 
-2. (Master) 補完コードのファイルを`.profile`で読み込むように変更
 
-   Raspberry Pi上では $\backslash$ (半角バックスラッシュ) と $￥$ (半角円記号)が区別されることに注意すること。
-   以下のコマンドで使用しているのはバックスラッシュである。
+
+
+### 4.2 コンテナアプリケーションのデプロイ
+
+Kubernetesではマニフェストと呼ばれるテキストファイルを適用することでアプリケーションをデプロイしたり、その他リソースを設定・運用したりします。
+
+マニフェストには各種リソースの設定・状態が宣言的に記述されており、Kubernetesがその通りに管理することでコンテナアプリケーションのデプロイやサービスの公開といったことが可能になっています。
+
+このようにインフラを命令的なプロセスで管理するのではなく、宣言的に記述したコードを用いて管理する手法を **Infrastructure as Code (IaC)** といいます。
+
+Kubernetesは命令的な操作も可能ですが、内部ではIaCで管理されています。
+
+実は コンテナアプリケーションやリソースのデプロイは flannel の構築で実践しているのですが、改めて体験してみましょう。
+今回は、Apache(httpd)のアプリケーションをデプロイします。
+
+1. Apacheのコンテナアプリケーションを表すDevelopmentのマニフェストを作成
+
+   以下のマニフェストはApacheのPodを5個維持するようなDeploymentを定義しています。
 
    ```bash
-   $ printf "\n# Kubectl shell completion\n\
-   source ~/.kube/kubectl_completion.bash.inc\n" >> ~/.profile
+   $ cat << EOF > /tmp/apache-deploy.yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     labels:
+       app: apache
+     name: apache
+     namespace: default
+   spec:
+     replicas: 5
+     selector:
+       matchLabels:
+         app: apache
+     template:
+       metadata:
+         labels:
+           app: apache
+       spec:
+         containers:
+         - name: apache-container
+           image: httpd:alpine
+           ports:
+           - containerPort:80
+   EOF
+   ```
+
+   手入力が面倒な場合は、以下のディレクトリにあるマニフェストを使用してください。
+
+   ```bash
+   $ ls -l ~/raspi-k8s-training/4.2/apache-deploy.yaml
+   ```
+
    
-   $ printf "\n# Kubeadm shell completion\n\
-   source ~/.kube/kubeadm_completion.bash.inc\n" >> ~/.profile
-   ```
 
-3. (Master) `.profile`を再読み込み
+2. 作成したマニフェストを適用してApacheをデプロイ
 
    ```bash
-   $ source ~/.profile
+   $ kubectl apply -f ~/apache-deploy.yaml
+   deployment.apps/apache created
    ```
 
-## 6. Ingressの有効化
-
-Ingressを有効化することで、クラスタ外部からのアクセスやトラフィック制御、ロードバランスなどが可能になります。
-
-以降の作業はMasterノードで実施してください。
-
-### 6.1 Nginx Ingress Controllerのデプロイ
-
-1. MasterにもPodをスケジュールできるように変更
-
-   通常、Masterノードには特別なPodしかスケジュールできないようになっている。
-   しかし、Raspberry Piでは使用できるリソースが少なく、Workerノード2台だけだとリソース不足になる可能性がある。
-   そこで、3台のRaspberry Piのリソースを最大限利用するために、MasterノードにもPodをスケジュールできるようにしている。
-
-   ```bash
-   $ kubectl taint nodes  raspi-k8s-master node-role.kubernetes.io/master-
-   ```
-
-2. Nginx Ingress Controllerをデプロイ
-
-   ```bash
-   $ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/baremetal/deploy.yaml
-   ```
-
-3. Nginx Ingress ControllerのPodがReadyになるまで待機
-
-   ```bash
-   # Nginx Ingress ControllerのPodがReadyになるまで待機
-   $ kubectl wait pod -n ingress-nginx -l app.kubernetes.io/component=controller --for=condition=Ready --timeout=5m
-   pod/ingress-nginx-controller-55bc4f5565-p2mh4 condition met
    
-   # Nginx Ingress ControllerのPodがReadyになっていることを確認
-   $ kubectl get pod -n ingress-nginx
-   NAME                                        READY   STATUS      RESTARTS   AGE
-   ingressnginx-admission-create-v9m2t         0/1     Completed   0          2m15s
-   ingressnginx-admission-patch-ph5th          0/1     Completed   1          2m15s
-   ingress-nginx-controller-55bc4f5565-p2mh4   1/1     Running     0          2m15s
+
+3. ApacheのDeploymentがAvailableになるまで待機
+
+   ```bash
+   # すべてのApache PodがReadyになるまで待機
+   $ kubectl wait pod -l app=apache --for=condition=Ready --timeout=5m
+   pod/apache-56654d682d-4xb2q condition met
+   pod/apache-56654d682d-cxzdd condition met
+   pod/apache-56654d682d-s1jdo condition met
+   pod/apache-56654d682d-disa9 condition met
+   pod/apache-56654d682d-42lgi condition met
+   
+   # すべてのApache PodがReadyになっていることを確認
+   $ kubectl get pod -l app=apache
+   NAME                      READY   STATUS    RESTARTS   AGE
+   apache-56654d682d-4xb2q   1/1     Running   0          7m51s
+   apache-56654d682d-cxzdd   1/1     Running   0          7m51s
+   apache-56654d682d-s1jdo   1/1     Running   0          7m51s
+   apache-56654d682d-disa9   1/1     Running   0          7m51s
+   apache-56654d682d-42lgi   1/1     Running   0          7m51s
+   
+   # Apache Deploymentを確認
+   $ kubectl get deploy -l app=apache
+   NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+   apache   5/5     5            5           8m21s
    ```
 
-### 6.2 Ingressの動作確認
+マニフェストを適用しただけで複数のアプリケーション（Pod）がデプロイされたことが分かると思います。
 
-今回はApacheとnginxという2種類のWebサーバをコンテナとして起動し、Ingressを用いてL7 LoadBalancingすることを想定しています。
+今回はDeploymentのみを適用しましたが、他の様々なリソースも同様にマニフェストを記述してデプロイするという部分は共通しています。
+
+### 4.3 コンテナアプリケーションの手動スケールイン/スケールアウト
+
+先ほどはレプリカ(Pod)が5つのDeploymentを作成しました。次はその数を変更してみましょう。
+
+1. 現在のApacheのレプリカ数を確認
+
+   ```bash
+   # Apache Deploymentの状態を確認
+   $ kubectl get deploy/apache
+   NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+   apache   5/5     5            5           12m
+   
+   # Podの数も確認
+   $ kubectl get pod -l app=apache
+   NAME                      READY   STATUS    RESTARTS   AGE
+   apache-56654d682d-42lgi   1/1     Running   0          13m
+   apache-56654d682d-4xb2q   1/1     Running   0          13m
+   apache-56654d682d-cxzdd   1/1     Running   0          13m
+   apache-56654d682d-disa9   1/1     Running   0          13m
+   apache-56654d682d-s1jdo   1/1     Running   0          13m
+   ```
+
+2. ApacheのDeploymentをスケールアウト（レプリカ数を増やす）
+
+   ```bash
+   $ kubectl scale deploy/apache --replicas=8
+   deployment.apps/apache scaled
+   ```
+
+3. スケールアウト後のレプリカ数を確認
+
+   ```bash
+   # スケールアウト後のApache Deploymentの状態を確認
+   $ kubectl get deploy/apache
+   NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+   apache   8/8     8            8           16m
+   
+   # Podの数も確認
+   # AGEが若いPodが増えていることが分かる
+   $ kubectl get pod -l app=apache
+   NAME                      READY   STATUS    RESTARTS   AGE
+   apache-56654d682d-42lgi   1/1     Running   0          13m
+   apache-56654d682d-4xb2q   1/1     Running   0          13m
+   apache-56654d682d-cxzdd   1/1     Running   0          13m
+   apache-56654d682d-d2f4s   1/1     Running   0          2m24s
+   apache-56654d682d-disa9   1/1     Running   0          13m
+   apache-56654d682d-s1jdo   1/1     Running   0          13m
+   apache-56654d682d-xjrww   1/1     Running   0          2m24s
+   apache-56654d682d-z94sx   1/1     Running   0          2m24s
+   ```
+
+4. ApacheのDeploymentをスケールイン（レプリカ数を減らす）
+
+   ```bash
+   $ kubectl scale deploy/apache --replicas=5
+   deployment.apps/apache scaled
+   ```
+
+5. スケールイン後のレプリカ数を確認
+
+   ```bash
+   # スケールイン後のApache Deploymentの状態を確認
+   $ kubectl get deploy/apache
+   NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+   apache   5/5     5            5           20m
+   
+   # Podの数も確認
+   # Podが5つに減っていることが分かる
+   $ kubectl get pod -l app=apache
+   NAME                      READY   STATUS    RESTARTS   AGE
+   apache-56654d682d-4xb2q   1/1     Running   0          22m
+   apache-56654d682d-cxzdd   1/1     Running   0          22m
+   apache-56654d682d-d2f4s   1/1     Running   0          11m
+   apache-56654d682d-s1jdo   1/1     Running   0          22m
+   apache-56654d682d-z94sx   1/1     Running   0          11m
+   ```
+
+
+このように、Kubernetesでは簡単にアプリケーション(Pod)の数を増減することができます。
+今回は説明しませんが、CPU使用率に合わせて自動的にスケールイン/スケールアウトするという機能もあります。
+
+Podの数を適切に変更することで、負荷を複数のPodに分散させることができ、安定してアプリケーションを稼働させることができるようになります。
+
+
+
+### 4.4 コンテナアプリケーションの自己修復
+
+Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」という機能があります。
+[Kubernetesが必要な理由と提供する機能 - Kuberentesとは何か？ | Kubernetes](https://kubernetes.io/ja/docs/concepts/overview/what-is-kubernetes/#why-you-need-kubernetes-and-what-can-it-do)
+
+自己修復の代表的な例として、「常にPod（コンテナ）の数を維持する」というものがあります。
+これにより、KubernetesではPodが異常終了してしまった場合やノードに異常が発生した場合でもコンテナアプリケーションを維持することができ、高可用性を実現できます。
+
+この章では、意図的に障害を発生させて、Kubernetesが障害発生時にどのような動作をするのか実際に確認してみましょう。
+
+#### 4.4.1 Podが異常終了した場合の自己修復
+
+まずは、Podが異常終了した場合の動作を確認してみましょう。
+今回は意図的にPodを1つ削除して障害を再現します。
+
+1. 削除対象のPodを決める
+
+   ```bash
+   # 以下は`kubectl get pod`実行時に
+   # 一番上に表示されるPodの名前を取得するコマンド
+   $ TARGET=$(kubectl get pod | grep apache | head -1 | awk '{print $1}')
+   
+   $ echo ${TARGET}
+   apache-56654d682d-4xb2q
+   ```
+
+2. Podを削除後、`watch`コマンドで経過を観察
+
+   `watch`コマンドは `Ctrl + C` で終了することができます。
+
+   ```bash
+   # 対象Podの削除し、経過を観察
+   $ kubectl delete pod ${TARGET} --wait=false; watch kubectl get pod
+   ```
+
+
+
+削除後の動きを観察すると、対象のPodの削除が削除されると同時に、新たなPodが追加されたことが確認できたと思います。
+これはあるべき状態（マニフェストに記載されたレプリカ数）と現在の状態（現在のレプリカ数）が一致しなくなったため、Kubernetesがあるべき状態に戻した（Podを自己修復した）ためです。
+
+このようにKubernetesではDeploymentのいくつかのPodが異常終了しても、すぐに自己修復されるので高い可用性を実現することができます。
+
+簡単に図で表すと以下のようなイメージ。
+
+![image-20210819163233439](raspi-k8s-training-materials_r1.assets/image-20210819163233439.png)
+
+
+
+#### 4.4.2 ノードに障害が発生した場合の自己修復
+
+次にPodがデプロイされているノードに障害が発生した場合の動作を確認してみましょう。
+
+今回は意図的にWorkerノードの電源を落とすことで、障害を発生させます。
+
+1. ApacheのDeploymentの設定を変更
+
+   ```bash
+   # 変更箇所の確認
+   # 行頭に+がついている行が apache-deploy-autoheal.yamlで追加された行
+   # デフォルトだとノードに障害が発生してから5分経過しないとPodが退避しないので、
+   # 今回はわかりやすいようにその時間を10秒にしている。
+   $ diff -u apachce-deploy.yaml apache-deploy-autoheal.yaml
+   --- apache-deploy.yaml  2021-08-19 10:20:24.647078676 +0900
+   +++ apache-deploy-autoheal.yaml 2021-08-19 10:19:30.723446276 +0900
+   @@ -20,4 +20,13 @@
+            image: httpd:alpine
+            ports:
+            - containerPort: 80
+   +      tolerations:
+   +      - effect: NoExecute
+   +        key: node.kubernetes.io/unreachable
+   +        operator: Exists
+   +        tolerationSeconds: 10
+   +      - effect: NoExecute
+   +        key: node.kubernetes.io/not-ready
+   +        operator: Exists
+   +        tolerationSeconds: 10
+   
+   # tolerationsの設定を追加
+   $ kubectl apply -f aaaaa/apache-deploy-autoheal.yaml
+   deployment.apps/apache configured
+   ```
+
+   
+
+2. `watch` コマンドでノードとPodの状況を監視
+
+   ```bash
+   $ watch "kubectl get node; echo; kubectl get pod -l app=apache -owide"
+   ```
+
+   この時点では以下のような状況。障害発生時の様子を観察するためコマンドは実行したままにする。
+
+   ```bash
+   NAME                 STATUS   ROLES                  AGE   VERSION
+   raspi-k8s-master     Ready    control-plane,master   27h   v1.21.3
+   raspi-k8s-worker01   Ready    worker                 26h   v1.21.3
+   raspi-k8s-worker02   Ready    worker                 26h   v1.21.3
+   
+   NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                 NOMINATED NODE   READINESS GATES
+   apache-595db6fcbb-7gpwb   1/1     Running   0          10m   10.244.1.53   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-7vr9p   1/1     Running   0          10m   10.244.2.70   raspi-k8s-worker02   <none>           <none>
+   apache-595db6fcbb-g8j7m   1/1     Running   0          10m   10.244.2.71   raspi-k8s-worker02   <none>           <none>
+   apache-595db6fcbb-gkrpc   1/1     Running   0          10m   10.244.0.22   raspi-k8s-master     <none>           <none>
+   apache-595db6fcbb-w7969   1/1     Running   0          10m   10.244.1.54   raspi-k8s-worker01   <none>           <none>
+   ```
+
+   
+
+3. `raspi-k8s-worker02` NodeのRaspberry Piから電源ケーブルを抜く
+
+   **誤って `raspi-k8s-master` Nodeの電源を抜かないように注意すること**
+
+   Kubernetesは40秒以上疎通が取れなくなった場合にそのノードをNotReadyと判断するため、`raspi-k8s-worker02` Nodeの電源ケーブルを抜いてもすぐにはNotReadyにはなりません。
+
+   40秒以上経過すると、まず `raspi-k8s-worker02`  Nodeが NotReadyに変化します。
+
+   ```bash
+   NAME                 STATUS     ROLES                  AGE   VERSION
+   raspi-k8s-master     Ready      control-plane,master   27h   v1.21.3
+   raspi-k8s-worker01   Ready      worker                 26h   v1.21.3
+   raspi-k8s-worker02   NotReady   worker                 26h   v1.21.3
+   
+   NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                 NOMINATED NODE   READINESS GATES
+   apache-595db6fcbb-7gpwb   1/1     Running   0          11m   10.244.1.53   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-7vr9p   1/1     Running   0          11m   10.244.2.70   raspi-k8s-worker02   <none>           <none>
+   apache-595db6fcbb-g8j7m   1/1     Running   0          11m   10.244.2.71   raspi-k8s-worker02   <none>           <none>
+   apache-595db6fcbb-gkrpc   1/1     Running   0          11m   10.244.0.22   raspi-k8s-master     <none>           <none>
+   apache-595db6fcbb-w7969   1/1     Running   0          11m   10.244.1.54   raspi-k8s-worker01   <none>           <none>
+   ```
+
+   次に `raspi-k8s-worker02` NodeがNot Readyになってから約10秒経過すると、 `raspi-k8s-worker02` NodeにデプロイされていたPodが `Terminating` になります。それと同時にレプリカ数を保つために他ノードでPodが起動していることが確認できると思います。
+
+   ```bash
+   NAME                 STATUS     ROLES                  AGE   VERSION
+   raspi-k8s-master     Ready      control-plane,master   27h   v1.21.3
+   raspi-k8s-worker01   Ready      worker                 26h   v1.21.3
+   raspi-k8s-worker02   NotReady   worker                 26h   v1.21.3
+   
+   NAME                      READY   STATUS        RESTARTS   AGE     IP            NODE                 NOMINATED NODE   READINESS GATES
+   apache-595db6fcbb-5g2ws   1/1     Running       0          2m38s   10.244.1.56   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-7gpwb   1/1     Running       0          13m     10.244.1.53   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-7vr9p   1/1     Terminating   0          13m     10.244.2.70   raspi-k8s-worker02   <none>           <none>
+   apache-595db6fcbb-8cqxd   1/1     Running       0          2m38s   10.244.1.55   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-g8j7m   1/1     Terminating   0          13m     10.244.2.71   raspi-k8s-worker02   <none>           <none>
+   apache-595db6fcbb-gkrpc   1/1     Running       0          13m     10.244.0.22   raspi-k8s-master     <none>           <none>
+   apache-595db6fcbb-w7969   1/1     Running       0          13m     10.244.1.54   raspi-k8s-worker01   <none>           <none>
+   ```
+
+    `raspi-k8s-worker02` NodeにデプロイされていたPodは本来削除されるはずですが、既に `raspi-k8s-worker02` Nodeとは疎通できない状態になっているため、削除処理が完了せずに残ったままになります。
+
+4. `raspi-k8s-worker02` NodeのRaspberry Piから電源ケーブルを接続する
+
+   電源を入れてから約1分ほど経過すると `raspi-k8s-worker02` Nodeが Ready に戻ります。
+   NotReadyの状態が続くようであれば、`raspi-k8s-worker02` Nodeがネットワークに接続されていることを確認してください。
+
+   ```bash
+   NAME                 STATUS   ROLES                  AGE   VERSION
+   raspi-k8s-master     Ready    control-plane,master   27h   v1.21.3
+   raspi-k8s-worker01   Ready    worker                 26h   v1.21.3
+   raspi-k8s-worker02   Ready    worker                 26h   v1.21.3
+   
+   NAME                      READY   STATUS        RESTARTS   AGE     IP            NODE                 NOMINATED NODE   READINESS GATES
+   apache-595db6fcbb-5g2ws   1/1     Running       0          2m38s   10.244.1.56   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-7gpwb   1/1     Running       0          13m     10.244.1.53   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-7vr9p   1/1     Terminating   0          13m     10.244.2.70   raspi-k8s-worker02   <none>           <none>
+   apache-595db6fcbb-8cqxd   1/1     Running       0          2m38s   10.244.1.55   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-g8j7m   1/1     Terminating   0          13m     10.244.2.71   raspi-k8s-worker02   <none>           <none>
+   apache-595db6fcbb-gkrpc   1/1     Running       0          13m     10.244.0.22   raspi-k8s-master     <none>           <none>
+   apache-595db6fcbb-w7969   1/1     Running       0          13m     10.244.1.54   raspi-k8s-worker01   <none>           <none>
+   ```
+
+   `raspi-k8s-worker02` Nodeが復旧してから2~3分ほど経過すると、Terminatingのまま残っていたPodが無事削除されていることが確認できると思います。
+
+   ```bash
+   NAME                 STATUS   ROLES                  AGE   VERSION
+   raspi-k8s-master     Ready    control-plane,master   27h   v1.21.3
+   raspi-k8s-worker01   Ready    worker                 26h   v1.21.3
+   raspi-k8s-worker02   Ready    worker                 26h   v1.21.3
+   
+   NAME                      READY   STATUS    RESTARTS   AGE     IP            NODE                 NOMINATED NODE   READINESS GATES
+   apache-595db6fcbb-5g2ws   1/1     Running   0          9m23s   10.244.1.56   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-7gpwb   1/1     Running   0          20m     10.244.1.53   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-8cqxd   1/1     Running   0          9m23s   10.244.1.55   raspi-k8s-worker01   <none>           <none>
+   apache-595db6fcbb-gkrpc   1/1     Running   0          20m     10.244.0.22   raspi-k8s-master     <none>           <none>
+   apache-595db6fcbb-w7969   1/1     Running   0          20m     10.244.1.54   raspi-k8s-worker01   <none>           <none>
+   ```
+
+   
+
+このように、Kubernetesでは単一ノードの障害程度なら自動的に障害検知・Podの退避などを行い、アプリケーションやサービスを提供し続けられるようになっています。
+
+図に表すと以下のようなイメージ。
+
+![image-20210819173936063](raspi-k8s-training-materials_r1.assets/image-20210819173936063.png)
+
+ここで注意したいのが、デフォルトでは**ノード障害から復旧しても、自動的にPodが再配置されることはない**ということです。
+上記の結果を見ると、 `raspi-k8s-worker02` Nodeが復旧しているにも拘らず、Podは `raspi-k8s-master` Nodeと`raspi-k8s-worker01` Nodeに偏っていることが分かります。
+
+Podがいくつかのノードに偏ってしまうと、負荷がかかってパフォーマンスが下がったり、単一障害点(SPOF)になったりする可能性があります。そのような状態を避けるために、Podを常にバランスよく分散させる [kube-descheduler](https://github.com/kubernetes-sigs/descheduler/tree/master) という機能も開発されています。
+
+
+
+### 4.5 アプリケーションの公開
+
+#### 4.5.1 アプリケーションの公開方法（未）
+
+（作成中）
+
+#### 4.5.2 公開するアプリケーションの準備
+
+今回はApacheとnginxという2種類のWebサーバをデプロイしていきます。
 
 1. Apache(httpd)をデプロイ
 
@@ -1073,6 +1564,67 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
    $ kubectl apply -f https://raw.githubusercontent.com/senimagan/raspi-k8s-training/main/manifests/5.2/nginx.yaml
    ```
 
+3. ApacheとnginxのPodがReadyになるまで待機
+
+   ```bash
+   # ApacheとnginxのPodがReadyになるまで待機
+   $ kubectl wait pod --all --for=condition=Ready --timeout=5m
+   pod/httpd-55583ft421-2q5ks condition met
+   pod/nginx-54fdf853c7-wf83h condition met
+   
+   # ApacheとnginxのPodがReadyになっていることを確認
+   $ kubectl get pod -n default
+   NAME                     READY   STATUS    RESTARTS   AGE
+   httpd-55583ft421-2q5ks   1/1     Running   0          4m15s
+   nginx-54fdf853c7-wf83h   1/1     Running   1          4m35s
+   ```
+
+
+#### 4.5.3 ClusterIP Serviceでの公開（未）
+
+（作成中）
+
+#### 4.5.4 NodePort Serviceでの公開（未）
+
+（作成中）
+
+#### 4.5.5 Ingressでの公開
+
+Ingressを有効化することで、クラスタ外部からのアクセスやトラフィック制御、ロードバランスなどが可能になります。
+
+以降の作業はMasterノードで実施してください。
+
+1. Nginx Ingress Controllerをデプロイ
+
+   ```bash
+   $ kubectl apply -f \
+   https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/baremetal/deploy.yaml
+   ```
+
+2. Nginx Ingress ControllerのPodがReadyになるまで待機
+
+   ```bash
+   # Nginx Ingress ControllerのPodがReadyになるまで待機
+   $ kubectl wait pod -n ingress-nginx -l app.kubernetes.io/component=controller --for=condition=Ready --timeout=5m
+   pod/ingress-nginx-controller-55bc4f5565-p2mh4 condition met
+   
+   # Nginx Ingress ControllerのPodがReadyになっていることを確認
+   $ kubectl get pod -n ingress-nginx
+   NAME                                        READY   STATUS      RESTARTS   AGE
+   ingress-nginx-admission-create-v9m2t         0/1     Completed   0          2m15s
+   ingress-nginx-admission-patch-ph5th          0/1     Completed   1          2m15s
+   ingress-nginx-controller-55bc4f5565-p2mh4   1/1     Running     0          2m15s
+   ```
+   
+   `ingress-nginx-admission-create-xxxxx` Podや`ingress-nginx-admission-patch-xxxxx` PodがCrashLoopBackOffとなる場合は、すべてのノードを再起動した上で以下のコマンドを実行します。
+   
+   ```bash
+   $ kubectl replace --force -f \
+   https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/baremetal/deploy.yaml
+   ```
+   
+   上記コマンドを実行したら、再度PodがReadyになるまで待機する。
+   
 3. Ingressを作成
 
    ```bash
@@ -1086,11 +1638,11 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
      rules:
      - http:
          paths:
-         - path: /nginx/
+         - path: /nginx
            backend:
              serviceName: nginx
              servicePort: 80
-         - path: /httpd/
+         - path: /httpd
            backend:
              serviceName: httpd
              servicePort: 80
@@ -1104,6 +1656,7 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
 
    ```bash
    # Nginx Ingress ControllerのNodePort Serviceを確認
+   # NodePortのポート番号はランダムなので、以下の結果と異なる場合があります
    $ kubectl get -n ingress-nginx svc/ingress-nginx-controller
    NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
    ingress-nginx-controller   NodePort    10.107.214.154   <none>        80:30431/TCP,443:30017/TCP   48m
@@ -1111,10 +1664,14 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
    # httpのポートを環境変数に格納
    $ HTTP_PORT=$(kubectl get -n ingress-nginx svc/ingress-nginx-controller \
    -o jsonpath='{.spec.ports[?(@.name=="http")].nodePort}')
+   
+   # 環境変数の中身を確認
+   $ echo ${HTTP_PORT}
+   30431
    ```
 
 5. Apacheとnginxにアクセス
-   Master, WorkerのいずれかのIPアドレス（今回は、`172.20.10.2`とする）に、手順4で取得したNodePortでアクセスする。
+   Master, WorkerのいずれかのIPアドレス（今回は、`172.20.10.2`とする）に、手順4で取得したNodePortでアクセスします。
 
    ```bash
    $ curl http://172.20.10.2:${HTTP_PORT}/nginx/
@@ -1124,87 +1681,22 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
    Welcome to Apache(httpd)!
    ```
 
-   それぞれApacheとNginxからレスポンスが返ってきており、複数のアプリを1つのNodePort Serviceで公開できていることがわかる。
+   それぞれApacheとNginxからレスポンスが返ってきており、複数のアプリを1つのNodePort Serviceで公開できていることがわかります。。
 
-   以下は今回作成したIngressのイメージ図である。
+   以下は今回作成したIngressのイメージ図です。
 
    ![Ingressのイメージ図](raspi-k8s-training-materials_r1.assets/ingress-image.png)
 
-   まず、30431番ポートへのリクエストをNginx ingress controllerが受け取り、そのリクエストのパスとIngressに設定したルールに従って、リクエストをPodに振り分けることでL7 LoadBalancingを実現している。
+   まず、30431番ポートへのリクエストをNginx ingress controllerが受け取り、そのリクエストのパスとIngressに設定したルールに従って、リクエストをPodに振り分けることでL7 LoadBalancingを実現しています。
 
-<div style="page-break-before:always"></div>
 
-## 7. k8sクラスタのメトリクス表示
 
-### 7.1 3.5インチディスプレイの設定(Masterのみ)
+### 4.6 メトリクスの監視（未）
 
-本作業はMasterのみ実施する
+#### 4.6.1 metrics-serverの追加（未）
 
-1. gitをインストール
-
-   ```bash
-   $ sudo apt install git -y
-   ```
-
-2. ディスプレイ用のプロジェクトをclone
-
-   ```bash
-   $ git clone https://github.com/kedei/LCD_driver
-   ```
-
-   カレントディレクトリに **LCD_driver** が展開されたことを確認
-
-   ```bash
-   $ ls -l | grep LCD_driver
-   drwxr-xr-x 6 tarte tarte 4096 Aug Jul 29 17:16 LCD_driver
-   ```
-   
-3. 権限を付与
-
-   ```bash
-   $ sudo chmod -R 777 LCD_driver
-   
-   #権限が(drwxrwxrwx)に変更されたことを確認
-   $ ls -l | grep LCD_driver
-   drwxrwxrwx 6 tarte tarte 4096 Aug Jul 29 17:16 LCD_driver
-   ```
-
-4. `LCD_driver`ディレクトリに移動
-
-   ```bash
-   $ cd LCD_driver
-   ```
-
-5. LCDドライバをインストール
-
-   ```bash
-   $ ./LCD35_show
-   ```
-
-   【補足内容】 
-   LCDドライバインストール後に再起動が実行されます。 
-   インストール後、以下方法でHDMI接続ディスプレイ表示　<==> 3.5インチディスプレイの切替が可能ですが、両ディスプレイを同時には利用できません。  
-
-   - 3.5インチディスプレイ表示切替
-
-     ```bash
-     $ cd ~/LCD_driver
-     $ sudo ./LCD35_show
-     # コマンド実行後に再起動され、3.5インチディスプレイ側で起動表示されます
-     ```
-
-   - HDMIディスプレイ表示切替
-
-     ```bash
-     $ cd ~/LCD_driver
-     $ sudo ./LCD_hdmi
-     # コマンド実行後に再起動され、HDMIディスプレイ側で起動表示されます
-     ```
-
-### 7.2 metrics-serverの追加
-
-デフォルトの状態ではKubernetesクラスタのメトリクスを取得することができないため、metrics-serverをデプロイする。
-metrics-serverをデプロイすることで、`kubectl top`コマンドを用いてKubernetesクラスタのメトリクスを収集できるようになる。
+デフォルトの状態ではKubernetesクラスタのメトリクスを取得することができないため、**metrics-server**をデプロイします。
+**metrics-server**をデプロイすることで、`kubectl top`コマンドを用いてKubernetesクラスタのメトリクスを収集できるようになります。
 
 1. (Master) `kubectl top`が動作しないことを確認
 
@@ -1282,9 +1774,11 @@ metrics-serverをデプロイすることで、`kubectl top`コマンドを用�
    error: metrics not available yet
    ```
 
-### 7.3 ディスプレイにメトリクスを表示する
+#### 4.6.2 メトリクスの可視化（未）
 
 SamplerというOSSを用いて、Masterに接続したディスプレイにKuberntesクラスタのメトリクスを表示できるようにする。
+
+この手順は
 
 1. (Master) プロジェクトをクローン
    @reireias氏が[sampler](https://github.com/sqshq/sampler)プロジェクトをフォークし、Arm用に改変したものを利用する。
@@ -1315,8 +1809,7 @@ SamplerというOSSを用いて、Masterに接続したディスプレイにKube
 5. (Master) samplerの設定ファイルを作成
 
    ```bash
-   $ sudo mkdir /etc/sampler
-   $ sudo vi /etc/sampler/k8s.yaml
+   $ sudo mkdir /etc/sampler$ sudo vi /etc/sampler/k8s.yaml
    ```
 
    ```yaml
@@ -1408,7 +1901,68 @@ SamplerというOSSを用いて、Masterに接続したディスプレイにKube
    $ sampler -c /etc/sampler/k8s.yaml
    ```
 
-#### （おまけ）samplerの起動時自動実行設定
+
+
+#### 4.6.3 （おまけ）小型ディスプレイへのメトリクスの表示（未）
+
+小型ディスプレイを使用するために、LCDドライバを設定します。本作業は小型ディスプレイを接続するノードのみに実施します。
+
+1. ディスプレイ用のプロジェクトをclone
+
+   ```bash
+   $ git clone https://github.com/kedei/LCD_driver
+   ```
+
+   カレントディレクトリに **LCD_driver** が展開されたことを確認
+
+   ```bash
+   $ ls -l | grep LCD_driver
+   drwxr-xr-x 6 tarte tarte 4096 Aug Jul 29 17:16 LCD_driver
+   ```
+   
+2. 権限を付与
+
+   ```bash
+   $ sudo chmod -R 777 LCD_driver
+   
+   #権限が(drwxrwxrwx)に変更されたことを確認
+   $ ls -l | grep LCD_driver
+   drwxrwxrwx 6 tarte tarte 4096 Aug Jul 29 17:16 LCD_driver
+   ```
+
+3. `LCD_driver`ディレクトリに移動
+
+   ```bash
+   $ cd LCD_driver
+   ```
+
+4. LCDドライバをインストール
+
+   ```bash
+   $ ./LCD35_show
+   ```
+
+   【補足内容】 
+   LCDドライバインストール後に再起動が実行されます。 
+   インストール後、以下方法でHDMI接続ディスプレイ表示 <==> 3.5インチディスプレイの切替が可能ですが、両ディスプレイを同時には利用できません。  
+
+   - 3.5インチディスプレイ表示切替
+
+     ```bash
+     $ cd ~/LCD_driver
+     $ sudo ./LCD35_show
+     # コマンド実行後に再起動され、3.5インチディスプレイ側で起動表示されます
+     ```
+
+   - HDMIディスプレイ表示切替
+
+     ```bash
+     $ cd ~/LCD_driver
+     $ sudo ./LCD_hdmi
+     # コマンド実行後に再起動され、HDMIディスプレイ側で起動表示されます
+     ```
+
+#### 4.6.4（おまけ）samplerの起動時自動実行設定（未）
 
 1. (Master) 以下のコマンドを実行し、`~/.profile`に追記
 
@@ -1426,8 +1980,39 @@ SamplerというOSSを用いて、Masterに接続したディスプレイにKube
    ```
 
 3. `3 Boot Options`を選択
+
 4. `B1 Desktop / CLI`を選択
+
 5. `B2 Console Autologin`を選択
+
 6. `<Finish>`を選択
+
 7. 再起動の確認をされるので、`<Yes>`を選択
+
 8. Masterに接続されているディスプレイに、samplerが表示されていることを確認
+
+
+
+## おわりに
+
+お疲れさまでした。以上で本研修の内容は完了です。
+
+構築したKubernetesクラスタはハンズオン研修の完了までは、壊さない限り自由に使っていただいて構いません。
+
+ただし、ハンズオン教育終了から翌2日以内に同梱の着払い伝票（ゆうパック）で忘れず返却してください。
+
+コンテナ(Docker)やKubernetesについてより詳しく学習したい場合は、ソフトウェアエンジニアリング本部主催の「Docker入門ハンズオン」と「Kubernetes入門ハンズオン」をおすすめします。
+
+- [Docker入門ハンズオン受講案内ページ | One NEC.com](https://one.nec.com/biz/si-service-dev/swe_tool_sde_op_training_handson-introduction-docker-preparation)
+- [Kubernetes入門ハンズオン受講案内ページ | One NEC.com](https://one.nec.com/biz/si-service-dev/swe_tool_sde_op_training_handson-introduction-k8s-preparation)
+
+また、ブラウザ上で実行可能なKubernetesの環境、オンラインラーニングKubernetesの公式ドキュメントにはブラウザ上で体験可能なチュートリアルが公開されているので、そちらを試してみることもおすすめします。
+
+- [Kubernetesの基本を学ぶ | Kubernetes](https://kubernetes.io/ja/docs/tutorials/kubernetes-basics/)
+
+他にも **[Katacoda](https://www.katacoda.com/)** という無料のオンラインラーニングサービスでもKubernetesのコースが公開されているのでお試しください。
+
+いくつかのシナリオに沿って、ブラウザ上で実際にKubernetesを操作することができるので、とてもお手軽に学習することができます。
+
+- [Learn Kubernetes using Interactive Browser-Based Labs | Katacoda](https://www.katacoda.com/courses/kubernetes)
+
