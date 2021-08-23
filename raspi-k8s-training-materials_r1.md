@@ -1120,7 +1120,7 @@ Kubernetesは命令的な操作も可能ですが、内部ではIaCで管理さ�
          - name: apache-container
            image: httpd:alpine
            ports:
-           - containerPort:80
+           - containerPort: 80
    EOF
    ```
 
