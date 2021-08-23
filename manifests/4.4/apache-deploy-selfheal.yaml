@@ -19,7 +19,7 @@ spec:
       - name: apache-container
         image: httpd:alpine
         ports:
-        - containerPort:80
+        - containerPort: 80
       tolerations:
       - effect: NoExecute
         key: node.kubernetes.io/unreachable
