@@ -1,21 +1,9 @@
 ---
 apiVersion: v1
-kind: Service
-metadata:
-  name: httpd
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
-  selector:
-    app: httpd
-  type: ClusterIP
----
-apiVersion: v1
 kind: ConfigMap
 metadata:
   name: httpd-html
+  namespace: publish-app
 data:
   index.html: |
     Welcome to Apache(httpd)!
@@ -24,6 +12,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: httpd
+  namespace: publish-app
 spec:
   replicas: 1
   selector:

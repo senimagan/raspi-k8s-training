@@ -1,21 +1,9 @@
 ---
 apiVersion: v1
-kind: Service
-metadata:
-  name: nginx
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
-  selector:
-    app: nginx
-  type: ClusterIP
----
-apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nginx-html
+  namespace: publish-app
 data:
   index.html: |
     Welcome to nginx!!
@@ -24,6 +12,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx
+  namespace: publish-app
 spec:
   replicas: 1
   selector:

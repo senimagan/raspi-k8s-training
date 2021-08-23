@@ -6,8 +6,6 @@
 
 
 
-<div style="page-break-before:always"></div>
-
 ## はじめに
 
 （仮文言）
@@ -84,8 +82,6 @@ Kubernetesを構築する前に、必要機材の確認やハードウェアな�
 | 社有iPhone                 | 1    | Raspberry Pi同士の接続およびインターネットアクセスに使用 |
 | シンクラ端末(SS10など)     | 1    | 本資料の参照やトラブルシュート時の調査・情報収集に使用   |
 
-<div style="page-break-before:always"></div>
-
 ### 1.2 Raspberry Piのラック組み立て
 
 Raspberry Piと積層ケースを開封しラックを組み立てます。
@@ -121,8 +117,6 @@ Raspberry Pi OS イメージを SD カードへインストールします。  �
 <img src="raspi-k8s-training-materials_r1.assets/chapter2.png" alt="第2章完了時点のイメージ図" style="zoom:80%;" />
 
 この手順を完了することで、Raspberry Piをコンピュータとして起動できるようになります。
-
-<div style="page-break-before:always"></div>
 
 #### 前提条件
 
@@ -186,8 +180,6 @@ Raspberry Pi OS イメージを SD カードへインストールします。  �
 10. 書込PCからmicroSDを取り出す
 
 以上の作業を3回繰り返して、OSをインストールしたmicroSDを3つ用意します。
-
-<div style="page-break-before:always"></div>
 
 ### 1.3 iPhoneの設定変更
 
@@ -620,8 +612,6 @@ $ sudo apt upgrade -y
 ※※  **2.1 から 2.10** までの作業は3台分(Master:1台、Worker:2台) 実施ください  ※※ 
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
 
-<div style="page-break-before:always"></div>
-
 ## 3. Kubernetesクラスタの構築／初期設定
 
 ここからKubernetesクラスタの構築と初期設定を行います。
@@ -631,7 +621,7 @@ $ sudo apt upgrade -y
 
 第3章の手順が完了した時点で、Kubernetesとして機能する基本的なクラスタが完成します。
 
-**3.1 - 3.2の作業はすべてのノードで実施してください。**
+**3.1 - 3.3の作業はすべてのノードで実施してください。**
 
 また、OSの設定が完了したことで各ノード同士はSSHでアクセスできるようになっています。
 ディスプレイやキーボードの抜き差しが面倒であれば、以降はSSHで各ノードを切り替えて作業を実施しても構いません。
@@ -795,8 +785,6 @@ Kubernetesの構築・運用に必要なパッケージをインストールし�
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
 ※※　**3.3** までの作業は3台分(Master:1台、Worker:2台)実施ください　※※
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
-
-<div style="page-break-before:always"></div>
 
 ### 3.4 Kubernetesクラスタの構築
 
@@ -1033,8 +1021,6 @@ Kubernetesクラスタを構築していきます。
 
 
 以上でKubernetesクラスタの構築は完了です。
-
-<div style="page-break-before:always"></div>
 
 ## 4. Kubernetesクラスタを運用しよう
 
@@ -1463,17 +1449,82 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
 
 ### 4.5 アプリケーションの公開（未）
 
-これまでの作業でアプリケーションはデプロイできましたが、現在の状態ではクラスタ外部からアプリケーションに
+これまでの作業でアプリケーションはデプロイできましたが、現在の状態ではクラスタ外部からアプリケーションにアクセスすることができません。
 
-#### 4.5.1 アプリケーションの外部公開方法（未）
+この章では、クラスタ外部からアプリケーションにアクセスできるようにしていきます。
 
-（作成中）
+#### 4.5.1 Serviceの概要とアプリケーションの外部公開
+
+実際にアプリケーションを公開する前に、アプリケーションの公開に必要なKubernetesのリソース（Service やIngress）について簡単に説明します。
+（厳密な定義や仕組みとは異なるのであくまでイメージとして捉えてください）
+
+ServiceとはPodへの接続を解決してくれるリソースです。
+Serviceにアクセスするとそれに紐づいたPodにトラフィックが振り分けられます。
+
+ServiceにはClusterIP,  NodePort, LoadBalancer, ExternalNameという4種類のタイプが存在します。
+このうち、NodePort と LoadBalancer は外部公開に使用されます。
+また、Serviceとは別に外部公開やアクセス制御を行うための Ingress というリソースが存在します。
+
+ここでは、よく使用される ClusterIP Service, NodePort Service, LoadBalancer Service, Ingressについて簡単に説明します。
+
+##### ClusterIP Service
+
+ClusterIP Service はKubernetes内での通信で利用されます。ClusterIP Service を作成すると、クラスタ内で利用可能なIPアドレスが払い出されます。そのIPアドレスにアクセスすると、Serviceに紐づくPodにトラフィックが振り分けられます。
+「[4.5.3 ClusterIP Serviceでの公開](#4.5.3 ClusterIP Serviceでの公開（未）)」にて、その動作を確認します。
+
+<img src="raspi-k8s-training-materials_r1.assets/image-20210823161416316.png" alt="image-20210823161416316" style="zoom:80%;" />
+
+##### NodePort Service
+
+NodePort Service はクラスタに参加しているNodeのランダムなポート(デフォルトだと30000~32767)を使用して、クラスタ外部にアプリケーションを公開します。NodePort Service は ClusterIP Service を拡張して実装されています。
+「[4.5.4 NodePort Serviceでの公開](#4.5.4 NodePort Serviceでの公開（未）)」にて、その動作を確認します。
+
+<img src="raspi-k8s-training-materials_r1.assets/image-20210823163029812.png" alt="image-20210823163029812" style="zoom:80%;" />
+
+この方法で公開した場合、アプリケーションにアクセスするには、`いずれかのNodeのIPアドレス`と`NodePortで使用しているポート` を指定する必要があります。
+そのため、アクセスしていたNodeが削除されたり、異常終了していたりするとアクセス不能になるというデメリットがあります。その場合は、他の有効なNodeのIPアドレスを指定すればアクセス可能ですが、常にそれを把握してアクセス先を変更するのは面倒です。
+そのデメリットを解消したのが、次に紹介する LoadBalancer Service です。
+
+##### LoadBalancer Service
+
+LoadBalancer Serviceは、内部でNodePortを作成したうえで、クラスタ外部もしくは内部にLoadBalancerを作成し、LoadBalancerのロードバランス先（バックエンド）として疎通可能なNodeとNodePortに転送します。
+
+本研修では使用しません。
+
+<img src="raspi-k8s-training-materials_r1.assets/image-20210823165723579.png" alt="image-20210823165723579" style="zoom:80%;" />
+
+パブリッククラウド上に構築したKubernetesの場合は、LoadBalancer Serviceを作成すると、そのパブリッククラウドで提供されているLoadBalancerがクラスタ外部に作成されます。
+例えば、AWSだとNetworkLoadBalancer もしくは ClassicLoadBalancerが作成されます。
+
+一方で、本研修のようなベアメタルな環境では、デフォルトだとLoadBalancer Serviceを使用することができません。
+これはベアメタルな環境では、クラスタ外部にLoadBalancerを動的に作成したり設定したりすることが難しいためです。ただし、[MetalLB](https://metallb.universe.tf/) というアプリケーションをデプロイすれば、ベアメタルな環境でもLoadBalancer Serviceを使用できるようになります。
+
+##### Ingress
+
+ここまでで紹介したNodePort ServiceやLoadBalancer Serviceでもアプリケーションの外部公開は可能ですが、Ingressを用いることでSSL/TLS終端の設定やパスによるルーティングなど、より柔軟な設定が可能となります。
+
+Ingressはデフォルトでは有効になっておらず、Ingress Controllerというアプリケーションをデプロイすることで利用可能になります。様々なベンダがIngress Controllerを開発しており、どのIngress Controllerを使用するかは用途や性能で自由に選択することができます。
+良く使用されるIngress Controllerとして、[NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) があります。
+
+「[4.5.5 Ingressでの公開](#4.5.5 Ingressでの公開)」にて、その動作を確認します。
 
 #### 4.5.2 公開するアプリケーションの準備
 
-今回はApacheとnginxという2種類のWebサーバをデプロイしていきます。
+アプリケーションを公開する前に、公開するアプリケーションを用意しましょう。
+今回はApacheとNGINXという2種類のWebサーバをデプロイしていきます。
 
-1. Apache(httpd)をデプロイ
+1. 検証用のNamespaceを作成
+
+   ```bash
+   $ kubectl create namespace publish-app
+   ```
+   
+   
+   
+2. Apache(httpd)をデプロイ
+
+   この手順ではApacheのDeploymentとConfigMapをデプロイします。
+   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルートにマウントしている。これにより、ApacheのPodにアクセスすると `index.html` の内容が表示されるようになる。
 
    ```bash
    # Apacheのマニフェストを確認
@@ -1481,22 +1532,10 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    $ cat ./4.5/apache.yaml
    ---
    apiVersion: v1
-   kind: Service
-   metadata:
-     name: httpd
-   spec:
-     ports:
-     - port: 80
-       protocol: TCP
-       targetPort: 80
-     selector:
-       app: httpd
-     type: ClusterIP
-   ---
-   apiVersion: v1
    kind: ConfigMap
    metadata:
      name: httpd-html
+     namespace: publish-app
    data:
      index.html: |
        Welcome to Apache(httpd)!
@@ -1505,6 +1544,7 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    kind: Deployment
    metadata:
      name: httpd
+     namespace: publish-app
    spec:
      replicas: 1
      selector:
@@ -1533,30 +1573,21 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    $ kubectl apply -f ./4.5/apache.yaml
    ```
 
-2. nginxをデプロイ
+3. NGINXをデプロイ
+
+   この手順ではNGINXのDeploymentとConfigMapをデプロイします。
+   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルートにマウントしている。これにより、ApacheのPodにアクセスすると `index.html` の内容が表示されるようになる。
 
    ```bash
-   # nginxのマニフェストを確認
+   # NGINXのマニフェストを確認
    $ cd ~/raspi-k8s-training/manifests/
    $ cat ./4.5/nginx.yaml
-   ---
-   apiVersion: v1
-   kind: Service
-   metadata:
-     name: nginx
-   spec:
-     ports:
-     - port: 80
-       protocol: TCP
-       targetPort: 80
-     selector:
-       app: nginx
-     type: ClusterIP
    ---
    apiVersion: v1
    kind: ConfigMap
    metadata:
      name: nginx-html
+     namespace: publish-app
    data:
      index.html: |
        Welcome to nginx!!
@@ -1565,6 +1596,7 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    kind: Deployment
    metadata:
      name: nginx
+     namespace: publish-app
    spec:
      replicas: 1
      selector:
@@ -1593,7 +1625,7 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    $ kubectl apply -f ./4.5/nginx.yaml
    ```
 
-3. ApacheとnginxのPodがReadyになるまで待機
+4. ApacheとnginxのPodがReadyになるまで待機
 
    ```bash
    # ApacheとnginxのPodがReadyになるまで待機
