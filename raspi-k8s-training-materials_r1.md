@@ -1060,7 +1060,19 @@ Kubernetesクラスタを構築していきます。
 
    ```bash
    $ ls -l raspi-k8s-training
+   total 720
+   drwxr-xt-x 10 tarte tarte   4096 Aug 23 18:19 manifests
+   drwxr-xt-x  2 tarte tarte   4096 Aug 23 18:19 raspi-k8s-training-materials_r1.assets
+   -rw-r--t--  1 tarte tarte 646511 Aug 23 18:19 raspi-k8s-training-materials_r1.html
+   -rwxr-xt-x  1 tarte tarte  78644 Aug 23 18:19 raspi-k8s-training-materials_r1.md
    
+   $ ls -l raspi-k8s-trining/manifests/
+   total 36
+   drwxr-xt-x 10 tarte tarte 4096 Aug 23 18:19 4.2
+   drwxr-xt-x 10 tarte tarte 4096 Aug 23 18:19 4.4
+   drwxr-xt-x 10 tarte tarte 4096 Aug 23 18:19 4.5
+   drwxr-xt-x 10 tarte tarte 4096 Aug 23 18:19 4.6
+   -rw-r--t--  1 tarte tarte 1160 Aug 23 18:19 readme.txt
    ```
 
 
@@ -1445,8 +1457,6 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
 
 Podがいくつかのノードに偏ってしまうと、負荷がかかってパフォーマンスが下がったり、単一障害点(SPOF)になったりする可能性があります。そのような状態を避けるために、Podを常にバランスよく分散させる [kube-descheduler](https://github.com/kubernetes-sigs/descheduler/tree/master) という機能も開発されています。
 
-
-
 ### 4.5 アプリケーションの公開（未）
 
 これまでの作業でアプリケーションはデプロイできましたが、現在の状態ではクラスタ外部からアプリケーションにアクセスすることができません。
@@ -1524,7 +1534,7 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 2. Apache(httpd)をデプロイ
 
    この手順ではApacheのDeploymentとConfigMapをデプロイします。
-   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルートにマウントしている。これにより、ApacheのPodにアクセスすると `index.html` の内容が表示されるようになる。
+   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルート配下の`httpd`ディレクトリにマウントしている。これにより、ApacheのPodにアクセスすると `index.html` の内容が表示されるようになる。
 
    ```bash
    # Apacheのマニフェストを確認
@@ -1571,12 +1581,14 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 
    ```bash
    $ kubectl apply -f ./4.5/apache.yaml
+   configmap/httpd-html created
+   deployment.apps/httpd created
    ```
 
 3. NGINXをデプロイ
 
    この手順ではNGINXのDeploymentとConfigMapをデプロイします。
-   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルートにマウントしている。これにより、ApacheのPodにアクセスすると `index.html` の内容が表示されるようになる。
+   ConfigMapには `index.html` が定義されており、それをDeploymentがNGINXのドキュメントルート配下の`nginx`ディレクトリにマウントしている。これにより、ApacheのPodにアクセスすると `index.html` の内容が表示されるようになる。
 
    ```bash
    # NGINXのマニフェストを確認
@@ -1615,33 +1627,116 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
            volumeMounts:
            - name: contents
              mountPath: /usr/share/nginx/html/nginx
+           - name: root-contents
+             mountPath: /usr/share/nginx/html
          volumes:
          - name: contents
+           configMap:
+             name: nginx-html
+         - name: root-contents
            configMap:
              name: nginx-html
    ```
 
    ```bash
    $ kubectl apply -f ./4.5/nginx.yaml
+   configmap/nginx-html created
+   deployment.apps/nginx created
    ```
 
 4. ApacheとnginxのPodがReadyになるまで待機
 
    ```bash
    # ApacheとnginxのPodがReadyになるまで待機
-   $ kubectl wait pod --all --for=condition=Ready --timeout=5m
+   $ kubectl wait pod -n publish-app --all --for=condition=Ready --timeout=5m
    pod/httpd-55583ft421-2q5ks condition met
    pod/nginx-54fdf853c7-wf83h condition met
    
    # ApacheとnginxのPodがReadyになっていることを確認
-   $ kubectl get pod -n default
+   $ kubectl get pod -n publish-app
    NAME                     READY   STATUS    RESTARTS   AGE
    httpd-55583ft421-2q5ks   1/1     Running   0          4m15s
    nginx-54fdf853c7-wf83h   1/1     Running   1          4m35s
    ```
 
+公開するアプリケーションの準備はこれで完了。
 
 #### 4.5.3 ClusterIP Serviceでの公開（未）
+
+現在の状態ではクラスタ内部で通信する場合でもPodのIPアドレスを指定する必要があります。
+ただ、PodのIPアドレスは作成されるたびにランダムに決まるため、このままだと不便です。
+
+そこで、ClusterIP Serviceを作成することで、クラスタ内部で名前解決できること、さらにPodのIPアドレスが変わってもServiceの設定を変更することなくアクセスできることを確認していきましょう。
+
+1. ApacheのClusterIP Serviceをデプロイ
+
+   ```bash
+   # ApacheのClusterIP Serviceのマニフェストを確認
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/apache-clusterip.yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: httpd-clusterip
+     namespace: publish-app
+   spec:
+     ports:
+     - port: 80
+       protocol: TCP
+       targetPort: 80
+     selector:
+       app: httpd
+     type: ClusterIP
+   ```
+
+   ```bash
+   $ kubectl apply -f ./4.5/apache-clusterip.yaml
+   service/httpd-clusterip created
+   ```
+
+2. NGINXのClusterIP Serviceをデプロイ
+
+   ```bash
+   # NGINXのClusterIP Serviceのマニフェストを確認
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/nginx-clusterip.yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: nginx-clusterip
+     namespace: publish-app
+   spec:
+     ports:
+     - port: 80
+       protocol: TCP
+       targetPort: 80
+     selector:
+       app: nginx
+     type: ClusterIP
+   ```
+
+   ```bash
+   $ kubectl apply -f ./4.5/nginx-clusterip.yaml
+   service/nginx-clusterip created
+   ```
+
+3. Serviceの一覧を確認
+
+   ```bash
+   $ kubectl get service -n publish-app
+   NAME              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+   httpd-clusterip   ClusterIP   10.111.224.54    <none>        80/TCP    3m8s
+   nginx-clusterip   ClusterIP   10.103.173.148   <none>        80/TCP    2m
+   ```
+
+4. クラスタ内部でClusterIP Serviceを介してApache Podにアクセスできることを確認
+
+   ```bash
+   # NGINX PodからApacheのClusterIP Serviceに対してwgetを実行
+   $ kubectl exec -n publish-app ngin
+   ```
+
+   
 
 （作成中）
 
