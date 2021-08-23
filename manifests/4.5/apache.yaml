@@ -31,12 +31,7 @@ spec:
         volumeMounts:
         - name: contents
           mountPath: /usr/local/apache2/htdocs/httpd/
-        - name: root-contents
-          mountPath: /usr/local/apache2/htdocs/
       volumes:
       - name: contents
-        configMap:
-          name: httpd-html
-      - name: root-contents
         configMap:
           name: httpd-html

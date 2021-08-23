@@ -1534,7 +1534,7 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 2. Apache(httpd)をデプロイ
 
    この手順ではApacheのDeploymentとConfigMapをデプロイします。
-   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルート配下の`httpd`ディレクトリにマウントしている。これにより、ApacheのPodにアクセスすると `index.html` の内容が表示されるようになる。
+   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルートとその配下の`httpd`ディレクトリにマウントしている。
 
    ```bash
    # Apacheのマニフェストを確認
@@ -1627,13 +1627,8 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
            volumeMounts:
            - name: contents
              mountPath: /usr/share/nginx/html/nginx
-           - name: root-contents
-             mountPath: /usr/share/nginx/html
          volumes:
          - name: contents
-           configMap:
-             name: nginx-html
-         - name: root-contents
            configMap:
              name: nginx-html
    ```
@@ -1733,7 +1728,8 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 
    ```bash
    # NGINX PodからApacheのClusterIP Serviceに対してwgetを実行
-   $ kubectl exec -n publish-app ngin
+   $ kubectl exec -n publish-app deploy/nginx -- httpd://httpd-clusterip/
+   <W>
    ```
 
    
