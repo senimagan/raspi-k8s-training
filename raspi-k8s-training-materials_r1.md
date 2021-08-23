@@ -16,7 +16,7 @@
 
 本研修を完了すると以下のようなクラスタが完成します。手順が多く大変ですが、楽しみながら学習していただけると幸いです。
 
-![raspi-1](raspi-k8s-training-materials_r1.assets/raspi-1.png)
+<img src="raspi-k8s-training-materials_r1.assets/raspi-1.png" alt="raspi-1" style="zoom:50%;" />
 
 
 
@@ -98,7 +98,7 @@ https://developers.cyberagent.co.jp/blog/archives/14721/
 
 以下はmicroSDをセットする前のRaspberry Piのイメージ図です。
 
-![第1章完了時点のイメージ図](raspi-k8s-training-materials_r1.assets/chapter1-16273583378831.png)
+<img src="raspi-k8s-training-materials_r1.assets/chapter1-16273583378831.png" alt="第1章完了時点のイメージ図" style="zoom: 80%;" />
 
 Raspberry PiはmicroSDにOSがインストールされているため、microSDをセットする前の状態では電源を接続しても起動しません。
 
@@ -118,7 +118,7 @@ Raspberry Pi OS イメージを SD カードへインストールします。  �
 
 以下はRaspberry Pi OSをインストールした後のイメージ図です。
 
-![第2章完了時点のイメージ図](raspi-k8s-training-materials_r1.assets/chapter2.png)
+<img src="raspi-k8s-training-materials_r1.assets/chapter2.png" alt="第2章完了時点のイメージ図" style="zoom:80%;" />
 
 この手順を完了することで、Raspberry Piをコンピュータとして起動できるようになります。
 
@@ -248,7 +248,7 @@ Hostnameの設定やWi-Fiへの接続などRaspberry Pi OS の初期設定を実
 
 以下はOSの初期設定後のイメージ図です。
 
-![第3章完了時点のイメージ図](raspi-k8s-training-materials_r1.assets/chapter3.png)
+<img src="raspi-k8s-training-materials_r1.assets/chapter3.png" alt="第3章完了時点のイメージ図" style="zoom: 70%;" />
 
 ### 2.1 キーボードレイアウトの変更
 
@@ -627,7 +627,7 @@ $ sudo apt upgrade -y
 ここからKubernetesクラスタの構築と初期設定を行います。
 以下はKubernetesクラスタ構築および設定後のイメージです。
 
-![chapter4](raspi-k8s-training-materials_r1.assets/chapter4-16274513114682.png)
+<img src="raspi-k8s-training-materials_r1.assets/chapter4-16274513114682.png" alt="chapter4" style="zoom: 70%;" />
 
 第3章の手順が完了した時点で、Kubernetesとして機能する基本的なクラスタが完成します。
 
@@ -757,7 +757,13 @@ Kubernetesの構築・運用に必要なパッケージをインストールし�
 
 `kubectl` と `kubeadm` の補完機能を有効化します。補完機能を有効にすることで、コマンド入力中にTabキーで入力を補完できるようになります。
 
-1. 補完コードをファイルに出力
+1. `.kube`ディレクトリを作成
+
+   ```bash
+   $ mkdir -p ~/.kube
+   ```
+   
+2. 補完コードをファイルに出力
 
    ```bash
    $ kubectl completion bash > ~/.kube/kubectl_completion.bash.inc
@@ -765,7 +771,7 @@ Kubernetesの構築・運用に必要なパッケージをインストールし�
    $ kubeadm completion bash > ~/.kube/kubeadm_completion.bash.inc
    ```
 
-2. 補完コードのファイルを`.profile`で読み込むように変更
+3. 補完コードのファイルを`.profile`で読み込むように変更
 
    Raspberry Pi上では $\backslash$ (半角バックスラッシュ) と $￥$ (半角円記号)が区別されることに注意すること。
    以下のコマンドで使用しているのはバックスラッシュである。
@@ -778,7 +784,7 @@ Kubernetesの構築・運用に必要なパッケージをインストールし�
    source ~/.kube/kubeadm_completion.bash.inc\n" >> ~/.profile
    ```
 
-3. ノードを再起動
+4. ノードを再起動
 
    ```bash
    $ sudo reboot
@@ -854,22 +860,12 @@ Kubernetesクラスタを構築していきます。
    2608eeb6840cde591b744ee0a3ecbe8d9278096a730f91d26c4e47d3d0788ebb2
    ```
 
-4. (Master) 出力したファイルをWorkerノードに転送
-
-   ```bash
-   # raspi-k8s-worker01にファイルを転送
-   $ scp  ~/token ~/ca-cert-hash tarte@raspi-k8s-worker01.local:/home/tarte/
-   # raspi-k8s-worker02にファイルを転送
-   $ scp  ~/token ~/ca-cert-hash tarte@raspi-k8s-worker02.local:/home/tarte/
-   ```
-
-5. (Master) `kubectl` の設定ファイルをコピー
+4. (Master) `kubectl` の設定ファイルをコピー
 
    `kubectl` でクラスタにアクセスして各種操作を実行するには認証情報を含んだ設定ファイルが必要になります。
    `kubeadm init` が完了すると設定ファイルが生成されるので、それを所定のディレクトリ(`~/.kube/`)にコピーします。
 
    ```bash
-   $ mkdir -p ~/.kube
    $ sudo cp /etc/kubernetes/admin.conf ~/.kube/config
    $ sudo chown $(id -u):$(id -g) ~/.kube/config
    ```
@@ -879,6 +875,15 @@ Kubernetesクラスタを構築していきます。
    ```bash
    $ ls -l ~/.kube/config
    -rw------- 1 tarte tarte 5595 Jul 29 10:24 /home/tarte/.kube/config
+   ```
+
+5. (Master) 出力したファイルをWorkerノードに転送
+
+   ```bash
+   # raspi-k8s-worker01にファイルを転送
+   $ scp  ~/token ~/ca-cert-hash ~/.kube/config tarte@raspi-k8s-worker01.local:/home/tarte/
+   # raspi-k8s-worker02にファイルを転送
+   $ scp  ~/token ~/ca-cert-hash ~/.kube/config tarte@raspi-k8s-worker02.local:/home/tarte/
    ```
 
 6. (Master) `kubectl` でリソースの情報を取得できることを確認
@@ -898,7 +903,7 @@ Kubernetesクラスタを構築していきます。
 
    flannel デプロイ後のネットワーク図は以下のようになっています。
 
-   ![flannelのアーキテクチャ](raspi-k8s-training-materials_r1.assets/flannel_architecture.png)
+   <img src="raspi-k8s-training-materials_r1.assets/flannel_architecture.png" alt="flannelのアーキテクチャ" style="zoom:70%;" />
 
    以下のコマンドを実行することで、flannelをデプロイすることができます。
 
@@ -935,7 +940,26 @@ Kubernetesクラスタを構築していきます。
    raspi-k8s-master    Ready     master    12m   v1.21.3
    ```
 
-10. (Worker01, Worker02) `kubeadm join`を実行し、Kubernetesクラスタに参加
+10. (Worker01, Worker02) `kubectl` の設定ファイルを所定のディレクトリに移動
+
+    **Worker01とWorker02のそれぞれで実行してください**
+
+    ```bash
+    # 所定のディレクトリに移動
+    $ mv ~/config ~/.kube/config
+    
+    # 権限を変更
+    $ sudo chown $(id -u):$(id -g) ~/.kube/config
+    ```
+
+    `~/.kube` 配下に config ファイルがコピーされていること、所有者とグループが `tarte`になっていることを確認します。
+
+    ```bash
+    $ ls -l ~/.kube/config
+    -rw------- 1 tarte tarte 5595 Jul 29 10:24 /home/tarte/.kube/config
+    ```
+
+11. (Worker01, Worker02) `kubeadm join`を実行し、Kubernetesクラスタに参加
 
     **Worker01とWorker02のそれぞれで実行してください**
 
@@ -954,7 +978,7 @@ Kubernetesクラスタを構築していきます。
     Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
     ```
 
-11. (Master) Worker01, Worker02が **Ready** になることを確認
+12. (Master) Worker01, Worker02が **Ready** になることを確認
 
     下記コマンドを実行すると、すべてのWorkerノードが **Ready** になるまで待機します。
     すべてのWorkerノードが **Ready** になるとコマンドが完了し、プロンプトが返ってきます。
@@ -973,7 +997,7 @@ Kubernetesクラスタを構築していきます。
     raspi-k8s-worker02   Ready    <none>                 10m   v1.21.3
     ```
 
-12. (Master) Workerノードに役割を表すラベルを付与
+13. (Master) Workerノードに役割を表すラベルを付与
 
     ```bash
     $ kubectl label node raspi-k8s-worker01  node-role.kubernetes.io/worker=
@@ -983,7 +1007,7 @@ Kubernetesクラスタを構築していきます。
     node/raspi-k8s-worker02 labeld
     ```
 
-13. (Master) 役割を表すラベルが付与されたことを確認
+14. (Master) 役割を表すラベルが付与されたことを確認
 
     役割を表すラベルを付与すると、ROLES列に役割が表示されるようになる。
 
@@ -995,7 +1019,7 @@ Kubernetesクラスタを構築していきます。
     raspi-k8s-worker02   Ready    worker                 27m   v1.21.3
     ```
 
-14. (Master) MasterにもPodをスケジュールできるように変更
+15. (Master) MasterにもPodをスケジュールできるように変更
 
     通常、Masterノードには特別なPodしかスケジュールできないようになっています。
     しかし、Raspberry Piでは使用できるリソースが少なく、Workerノード2台だけだとリソース不足になる可能性があります。
@@ -1277,7 +1301,7 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
 
 簡単に図で表すと以下のようなイメージ。
 
-![image-20210819163233439](raspi-k8s-training-materials_r1.assets/image-20210819163233439.png)
+<img src="raspi-k8s-training-materials_r1.assets/image-20210819163233439.png" alt="image-20210819163233439" style="zoom:60%;" />
 
 
 
@@ -1291,13 +1315,13 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
 
    ```bash
    # 変更箇所の確認
-   # 行頭に+がついている行が apache-deploy-autoheal.yamlで追加された行
+   # 行頭に+がついている行が apache-deploy-selfheal.yamlで追加された行
    # デフォルトだとノードに障害が発生してから5分経過しないとPodが退避しないので、
    # 今回はわかりやすいようにその時間を10秒にしている。
    $ cd ~/raspi-k8s-training/manifests/
-   $ diff -u ./4.2/apachce-deploy.yaml ./4.4/apache-deploy-autoheal.yaml
+   $ diff -u ./4.2/apachce-deploy.yaml ./4.4/apache-deploy-selfheal.yaml
    --- ./4.2/apachce-deploy.yaml  2021-08-19 10:20:24.647078676 +0900
-   +++  ./4.4/apache-deploy-autoheal.yaml 2021-08-19 10:19:30.723446276 +0900
+   +++  ./4.4/apache-deploy-selfheal.yaml 2021-08-19 10:19:30.723446276 +0900
    @@ -20,4 +20,13 @@
             image: httpd:alpine
             ports:
@@ -1313,7 +1337,7 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
    +        tolerationSeconds: 10
    
    # tolerationsの設定を追加
-   $ kubectl apply -f  ./4.4/apache-deploy-autoheal.yaml
+   $ kubectl apply -f  ./4.4/apache-deploy-selfheal.yaml
    deployment.apps/apache configured
    ```
 
@@ -1347,9 +1371,9 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
 
    **誤って `raspi-k8s-master` Nodeの電源を抜かないように注意すること**
 
-   Kubernetesは40秒以上疎通が取れなくなった場合にそのノードをNotReadyと判断するため、`raspi-k8s-worker02` Nodeの電源ケーブルを抜いてもすぐにはNotReadyにはなりません。
+   Kubernetesは40秒以上疎通が取れなくなった場合にそのノードを **NotReady** と判断するため、`raspi-k8s-worker02` Nodeの電源ケーブルを抜いてもすぐには **NotReady** にはなりません。
 
-   40秒以上経過すると、まず `raspi-k8s-worker02`  Nodeが NotReadyに変化します。
+   40秒以上経過すると、まず `raspi-k8s-worker02`  Nodeが **NotReady** に変化します。
 
    ```bash
    NAME                 STATUS     ROLES                  AGE   VERSION
@@ -1365,7 +1389,7 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
    apache-595db6fcbb-w7969   1/1     Running   0          11m   10.244.1.54   raspi-k8s-worker01   <none>           <none>
    ```
 
-   次に `raspi-k8s-worker02` NodeがNot Readyになってから約10秒経過すると、 `raspi-k8s-worker02` NodeにデプロイされていたPodが `Terminating` になります。それと同時にレプリカ数を保つために他ノードでPodが起動していることが確認できると思います。
+   次に `raspi-k8s-worker02` Nodeが **Not Ready** になってから約10秒経過すると、 `raspi-k8s-worker02` NodeにデプロイされていたPodが **Terminating** になります。それと同時にレプリカ数を保つために他ノードでPodが起動していることが確認できると思います。
 
    ```bash
    NAME                 STATUS     ROLES                  AGE   VERSION
@@ -1387,7 +1411,7 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
 
 4. `raspi-k8s-worker02` NodeのRaspberry Piから電源ケーブルを接続する
 
-   電源を入れてから約1分ほど経過すると `raspi-k8s-worker02` Nodeが Ready に戻ります。
+   電源を入れてから約1分ほど経過すると `raspi-k8s-worker02` Nodeが **Ready** に戻ります。
    NotReadyの状態が続くようであれば、`raspi-k8s-worker02` Nodeがネットワークに接続されていることを確認してください。
 
    ```bash
@@ -1406,7 +1430,7 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
    apache-595db6fcbb-w7969   1/1     Running       0          13m     10.244.1.54   raspi-k8s-worker01   <none>           <none>
    ```
 
-   `raspi-k8s-worker02` Nodeが復旧してから2~3分ほど経過すると、Terminatingのまま残っていたPodが無事削除されていることが確認できると思います。
+   `raspi-k8s-worker02` Nodeが復旧してから2~3分ほど経過すると、**Terminating** のまま残っていたPodが無事削除されていることが確認できると思います。
 
    ```bash
    NAME                 STATUS   ROLES                  AGE   VERSION
@@ -1428,7 +1452,7 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
 
 図に表すと以下のようなイメージ。
 
-![image-20210819173936063](raspi-k8s-training-materials_r1.assets/image-20210819173936063.png)
+<img src="raspi-k8s-training-materials_r1.assets/image-20210819173936063.png" alt="image-20210819173936063" style="zoom:60%;" />
 
 ここで注意したいのが、デフォルトでは**ノード障害から復旧しても、自動的にPodが再配置されることはない**ということです。
 上記の結果を見ると、 `raspi-k8s-worker02` Nodeが復旧しているにも拘らず、Podは `raspi-k8s-master` Nodeと`raspi-k8s-worker01` Nodeに偏っていることが分かります。
@@ -1437,9 +1461,11 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
 
 
 
-### 4.5 アプリケーションの公開
+### 4.5 アプリケーションの公開（未）
 
-#### 4.5.1 アプリケーションの公開方法（未）
+これまでの作業でアプリケーションはデプロイできましたが、現在の状態ではクラスタ外部からアプリケーションに
+
+#### 4.5.1 アプリケーションの外部公開方法（未）
 
 （作成中）
 
@@ -1689,7 +1715,7 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
 
    以下は今回作成したIngressのイメージ図です。
 
-   ![Ingressのイメージ図](raspi-k8s-training-materials_r1.assets/ingress-image.png)
+   <img src="raspi-k8s-training-materials_r1.assets/ingress-image.png" alt="Ingressのイメージ図" style="zoom:70%;" />
 
    まず、30431番ポートへのリクエストをNginx ingress controllerが受け取り、そのリクエストのパスとIngressに設定したルールに従って、リクエストをPodに振り分けることでL7 LoadBalancingを実現しています。
 
