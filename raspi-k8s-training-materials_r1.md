@@ -1511,7 +1511,7 @@ LoadBalancer Serviceは、内部でNodePortを作成したうえで、クラス�
 
 ##### Ingress
 
-ここまでで紹介したNodePort ServiceやLoadBalancer Serviceでもアプリケーションの外部公開は可能ですが、Ingressを用いることでSSL/TLS終端の設定やパスによるルーティング、重み付き負荷分散など、より柔軟な設定が可能となります。
+ここまでで紹介したNodePort ServiceやLoadBalancer Serviceでもアプリケーションの外部公開は可能ですが、Ingressを用いることでSSL/TLS終端の設定やパスによるルーティング、カナリアリリースなど、より柔軟な設定が可能となります。
 
 Ingressはデフォルトでは有効になっておらず、Ingress Controllerというアプリケーションをデプロイすることで利用可能になります。様々なベンダがIngress Controllerを開発しており、どのIngress Controllerを使用するかは用途や性能で自由に選択することができます。
 良く使用されるIngress Controllerとして、[NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) があります。
@@ -1885,6 +1885,7 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 #### 4.5.5 Ingressでの公開（未）
 
 最後にIngressを使うことで、より柔軟にアプリケーションを外部公開できることを確認していきます。
+今回は、パスによって接続先のアプリケーションを切り替えるIngressを作成していきます。
 
 1. NGINX Ingress Controllerをデプロイ
 
@@ -1988,67 +1989,26 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 
    もちろん、iPhoneからでもアクセスできます。
 
-   <img src="raspi-k8s-training-materials_r1.assets/image-20210824112708545.png" alt="image-20210824112708545" style="zoom:75%;" />
-
    それぞれApacheとNginxからレスポンスが返ってきており、複数のアプリを1つのNodePort Serviceで公開できていることがわかります。
 
-   以下は今回作成したIngressのイメージ図です。
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210824112708545.png" alt="image-20210824112708545" style="zoom:75%;" />
+
+今回作成したパスによるルーティングを行うIngressのイメージ図は以下のようになります。
 
    <img src="raspi-k8s-training-materials_r1.assets/ingress-image.png" alt="Ingressのイメージ図" style="zoom:70%;" />
 
-   まず、30431番ポートへのリクエストをNginx ingress controllerが受け取り、そのリクエストのパスとIngressに設定したルールに従って、リクエストをPodに振り分けることでL7 LoadBalancingを実現しています。
+まず、30431番ポートへのリクエストをNginx ingress controllerが受け取り、そのリクエストのパスとIngressに設定したルールに従って、リクエストをPodに振り分けることでL7 LoadBalancingを実現しています。
 
-6. カナリアリリースを行うIngressを作成
-
-   カナリアリリースとは、新しいバージョンのアプリケーションをリリースする際などに、一部のユーザのみ新バージョンを利用できるようにリリースすることで、新バージョンに問題がないことを確認しつつ、段階的に新バージョンを展開していくリリース手法です。
-
-   今回は簡単に、`/`のパスへのアクセスのうち、20%をApache、80%をNGINXに振り分けてみます。
-
-   ```bash
-   # Ingressのマニフェストを確認
-   $ cd ~/raspi-k8s-training/manifests/
-   $ cat ./4.5/ingress-path.yaml
-   apiVersion: networking.k8s.io/v1
-   kind: Ingress
-   metadata:
-     name: ingress-canary
-     namespace: publish-app
-     annotations:
-       nginx.ingress.kubernetes.io/service-weight: |
-         nginx-clusterip: 20, httpd-clusterip: 80
-   spec:
-     rules:
-     - http:
-         paths:
-         - path: /
-           pathType: Prefix
-           backend:
-             service: 
-               name: nginx-clusterip
-               port:
-                 number: 80
-         - path: /
-           pathType: Prefix
-           backend:
-             service:
-               name: httpd-clusterip
-               port:
-                 number: 80
-   ```
-
-   ```bash
-   $ kubectl apply -f ./4.5/ingress-
-   ```
-
-   
-
-7. 
-
-
+Ingress Controllerの種類にもよりますが、他にもカナリアリリースやSSL/TLS終端の設定、タイムアウトの設定など様々な設定が可能です。
 
 ### 4.6 メトリクスの監視（未）
 
-#### 4.6.1 metrics-serverの追加（未）
+実際にKubernetesを運用していくには、クラスタのCPU/メモリの使用量がどれくらいか、異常が発生しているPodがないかなど、様々なメトリクスを監視していく必要があります。
+本番環境などでは、[Prometheus](https://prometheus.io/) + [Grafana](https://grafana.com/)などのOSSを組み合わせたり、DataDogのような要監視サービスを使ったりして監視することが多いです。
+
+本研修の環境では[Prometheus](https://prometheus.io/) + [Grafana](https://grafana.com/)を動かすにはマシンリソースが足りないので、他のOSSを組み合わせて最低限のメトリクス（NodeのCPU/メモリ使用率、各種リソースの数など）を監視できるようにしていきましょう。
+
+#### 4.6.1 metrics-serverの追加
 
 デフォルトの状態ではKubernetesクラスタのメトリクスを取得することができないため、**metrics-server**をデプロイします。
 **metrics-server**をデプロイすることで、`kubectl top`コマンドを用いてKubernetesクラスタのメトリクスを収集できるようになります。
@@ -2057,7 +2017,9 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 
    ```bash
    $ kubectl top node
-   Erro from server (NotFound): the server could not find the requested resource (get services http:heapster:)
+   W0824 15:20:51.901684   19176 top_node.go:119] Using json format to get metrics. Next release will switch to protocol-buffers, switch early by passing --use-protocol-buffers flag
+   error: Metrics API not available
+   
    ```
 
 2. (Master) metrics-serverをデプロイ
