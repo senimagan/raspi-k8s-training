@@ -1,11 +1,29 @@
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-canary
+  name: ingress-canary-apache
   namespace: publish-app
   annotations:
-    nginx.ingress.kubernetes.io/service-weight: |
-      nginx-clusterip: 20, httpd-clusterip: 80
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: 20
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: httpd-clusterip
+            port:
+              number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-canary-nginx
+  namespace: publish-app
 spec:
   rules:
   - http:
@@ -17,10 +35,4 @@ spec:
             name: nginx-clusterip
             port:
               number: 80
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: httpd-clusterip
-            port:
-              number: 80
+

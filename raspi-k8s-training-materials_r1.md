@@ -2011,26 +2011,33 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
    apiVersion: networking.k8s.io/v1
    kind: Ingress
    metadata:
-     name: ingress-path
+     name: ingress-canary
      namespace: publish-app
+     annotations:
+       nginx.ingress.kubernetes.io/service-weight: |
+         nginx-clusterip: 20, httpd-clusterip: 80
    spec:
      rules:
      - http:
          paths:
-         - path: /nginx
+         - path: /
            pathType: Prefix
            backend:
              service: 
                name: nginx-clusterip
                port:
                  number: 80
-         - path: /httpd
+         - path: /
            pathType: Prefix
            backend:
              service:
                name: httpd-clusterip
                port:
                  number: 80
+   ```
+
+   ```bash
+   $ kubectl apply -f ./4.5/ingress-
    ```
 
    
