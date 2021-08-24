@@ -1935,12 +1935,14 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
      - http:
          paths:
          - path: /nginx
+           pathType: Prefix
            backend:
              service: 
                name: nginx-clusterip
                port:
                  number: 80
          - path: /httpd
+           pathType: Prefix
            backend:
              service:
                name: httpd-clusterip
@@ -1950,9 +1952,12 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 
    ```bash
    $ kubectl apply -f ./4.5/ingress-path.yaml
+   ingress.networking.k8s.io/ingress-path created
    ```
 
 4. Nginx Ingress ControllerのNodePort Serviceを確認
+
+   今回はNGINX Ingress Controllerをベアメタル環境で構築しているため、アプリケーションはNGINX Ingress ControllerのNodePort Serviceを介して公開されます。
 
    ```bash
    # Nginx Ingress ControllerのNodePort Serviceを確認
@@ -1981,13 +1986,56 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
    Welcome to Apache(httpd)!
    ```
 
-   それぞれApacheとNginxからレスポンスが返ってきており、複数のアプリを1つのNodePort Serviceで公開できていることがわかります。。
+   もちろん、iPhoneからでもアクセスできます。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210824112708545.png" alt="image-20210824112708545" style="zoom:75%;" />
+
+   それぞれApacheとNginxからレスポンスが返ってきており、複数のアプリを1つのNodePort Serviceで公開できていることがわかります。
 
    以下は今回作成したIngressのイメージ図です。
 
    <img src="raspi-k8s-training-materials_r1.assets/ingress-image.png" alt="Ingressのイメージ図" style="zoom:70%;" />
 
    まず、30431番ポートへのリクエストをNginx ingress controllerが受け取り、そのリクエストのパスとIngressに設定したルールに従って、リクエストをPodに振り分けることでL7 LoadBalancingを実現しています。
+
+6. カナリアリリースを行うIngressを作成
+
+   カナリアリリースとは、新しいバージョンのアプリケーションをリリースする際などに、一部のユーザのみ新バージョンを利用できるようにリリースすることで、新バージョンに問題がないことを確認しつつ、段階的に新バージョンを展開していくリリース手法です。
+
+   今回は簡単に、`/`のパスへのアクセスのうち、20%をApache、80%をNGINXに振り分けてみます。
+
+   ```bash
+   # Ingressのマニフェストを確認
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/ingress-path.yaml
+   apiVersion: networking.k8s.io/v1
+   kind: Ingress
+   metadata:
+     name: ingress-path
+     namespace: publish-app
+   spec:
+     rules:
+     - http:
+         paths:
+         - path: /nginx
+           pathType: Prefix
+           backend:
+             service: 
+               name: nginx-clusterip
+               port:
+                 number: 80
+         - path: /httpd
+           pathType: Prefix
+           backend:
+             service:
+               name: httpd-clusterip
+               port:
+                 number: 80
+   ```
+
+   
+
+7. 
 
 
 
