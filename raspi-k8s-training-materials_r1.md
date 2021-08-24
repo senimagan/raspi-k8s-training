@@ -2019,7 +2019,6 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
    $ kubectl top node
    W0824 15:20:51.901684   19176 top_node.go:119] Using json format to get metrics. Next release will switch to protocol-buffers, switch early by passing --use-protocol-buffers flag
    error: Metrics API not available
-   
    ```
 
 2. (Master) metrics-serverをデプロイ
