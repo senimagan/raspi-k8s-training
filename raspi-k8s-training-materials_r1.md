@@ -1938,12 +1938,14 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
            backend:
              service: 
                name: nginx-clusterip
-               port: 80
+               port:
+                 number: 80
          - path: /httpd
            backend:
              service:
                name: httpd-clusterip
-               port: 80
+               port:
+                 number: 80
    ```
 
    ```bash
