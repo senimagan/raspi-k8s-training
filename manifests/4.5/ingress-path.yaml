@@ -8,12 +8,14 @@ spec:
   - http:
       paths:
       - path: /nginx
+        pathType: Prefix
         backend:
           service: 
             name: nginx-clusterip
             port:
               number: 80
       - path: /httpd
+        pathType: Prefix
         backend:
           service:
             name: httpd-clusterip
