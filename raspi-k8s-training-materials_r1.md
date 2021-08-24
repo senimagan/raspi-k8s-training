@@ -1480,14 +1480,14 @@ ServiceにはClusterIP,  NodePort, LoadBalancer, ExternalNameという4種類の
 ##### ClusterIP Service
 
 ClusterIP Service はKubernetes内での通信で利用されます。ClusterIP Service を作成すると、クラスタ内で利用可能なIPアドレスが払い出されます。そのIPアドレスにアクセスすると、Serviceに紐づくPodにトラフィックが振り分けられます。
-「[4.5.3 ClusterIP Serviceでの公開](#4.5.3 ClusterIP Serviceでの公開（未）)」にて、その動作を確認します。
+「[4.5.3 ClusterIP Serviceでの公開](#4.5.3 ClusterIP Serviceでの公開)」にて、その動作を確認します。
 
 <img src="raspi-k8s-training-materials_r1.assets/image-20210823161416316.png" alt="image-20210823161416316" style="zoom:80%;" />
 
 ##### NodePort Service
 
 NodePort Service はクラスタに参加しているNodeのランダムなポート(デフォルトだと30000~32767)を使用して、クラスタ外部にアプリケーションを公開します。NodePort Service は ClusterIP Service を拡張して実装されています。
-「[4.5.4 NodePort Serviceでの公開](#4.5.4 NodePort Serviceでの公開（未）)」にて、その動作を確認します。
+「[4.5.4 NodePort Serviceでの公開](#4.5.4 NodePort Serviceでの公開)」にて、その動作を確認します。
 
 <img src="raspi-k8s-training-materials_r1.assets/image-20210823163029812.png" alt="image-20210823163029812" style="zoom:80%;" />
 
@@ -1511,7 +1511,7 @@ LoadBalancer Serviceは、内部でNodePortを作成したうえで、クラス�
 
 ##### Ingress
 
-ここまでで紹介したNodePort ServiceやLoadBalancer Serviceでもアプリケーションの外部公開は可能ですが、Ingressを用いることでSSL/TLS終端の設定やパスによるルーティングなど、より柔軟な設定が可能となります。
+ここまでで紹介したNodePort ServiceやLoadBalancer Serviceでもアプリケーションの外部公開は可能ですが、Ingressを用いることでSSL/TLS終端の設定やパスによるルーティング、重み付き負荷分散など、より柔軟な設定が可能となります。
 
 Ingressはデフォルトでは有効になっておらず、Ingress Controllerというアプリケーションをデプロイすることで利用可能になります。様々なベンダがIngress Controllerを開発しており、どのIngress Controllerを使用するかは用途や性能で自由に選択することができます。
 良く使用されるIngress Controllerとして、[NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) があります。
@@ -1529,12 +1529,10 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
    $ kubectl create namespace publish-app
    ```
    
-   
-   
 2. Apache(httpd)をデプロイ
 
    この手順ではApacheのDeploymentとConfigMapをデプロイします。
-   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルートとその配下の`httpd`ディレクトリにマウントしている。
+   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルート配下の`httpd`ディレクトリにマウントしている。
 
    ```bash
    # Apacheのマニフェストを確認
@@ -1588,7 +1586,7 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 3. NGINXをデプロイ
 
    この手順ではNGINXのDeploymentとConfigMapをデプロイします。
-   ConfigMapには `index.html` が定義されており、それをDeploymentがNGINXのドキュメントルート配下の`nginx`ディレクトリにマウントしている。これにより、ApacheのPodにアクセスすると `index.html` の内容が表示されるようになる。
+   ConfigMapには `index.html` が定義されており、それをDeploymentがNGINXのドキュメントルート配下の`nginx`ディレクトリにマウントしている。
 
    ```bash
    # NGINXのマニフェストを確認
@@ -1656,12 +1654,12 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 
 公開するアプリケーションの準備はこれで完了。
 
-#### 4.5.3 ClusterIP Serviceでの公開（未）
+#### 4.5.3 ClusterIP Serviceでの公開
 
 現在の状態ではクラスタ内部で通信する場合でもPodのIPアドレスを指定する必要があります。
 ただ、PodのIPアドレスは作成されるたびにランダムに決まるため、このままだと不便です。
 
-そこで、ClusterIP Serviceを作成することで、クラスタ内部で名前解決できること、さらにPodのIPアドレスが変わってもServiceの設定を変更することなくアクセスできることを確認していきましょう。
+そこで、ClusterIP Serviceを作成することで、クラスタ内部で名前解決できること、さらにPodのIPアドレスが変わってもServiceの設定を変更することなくアクセスできることを確認していきます。
 
 1. ApacheのClusterIP Serviceをデプロイ
 
@@ -1726,27 +1724,171 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 
 4. クラスタ内部でClusterIP Serviceを介してApache Podにアクセスできることを確認
 
+   NGINX PodからApacheのClusterIP Serviceに対してアクセスしてみます。
+
    ```bash
    # NGINX PodからApacheのClusterIP Serviceに対してwgetを実行
-   $ kubectl exec -n publish-app deploy/nginx -- httpd://httpd-clusterip/
-   <W>
+   $ kubectl exec -n publish-app deploy/nginx -- http://httpd-clusterip/
+   <html><body><h1>It works!</h1></body></html>
+   
+   # ClusterIP　ServiceのIPアドレスを指定しても同じ動作になる
+   $ APACHE_CLUSTERIP=`kubectl get svc -n publish-app httpd-clusterip -ojsonpath='{.spec.clusterIP}'`
+   $ kubectl exec -n publish-app deploy/nginx -- http://${APACHE_CLUSTERIP}/
+   <html><body><h1>It works!</h1></body></html>
+   
+   # httpdパスを指定するとマウントしたファイルが出力される
+   $ kubectl exec -n publish-app deploy/nginx -- http://httpd-clusterip/httpd/
+   Welcome to Apache(httpd)!
    ```
 
+   このようにApacheのClusterIP Serviceで名前解決することで、ApacheのPodにアクセスできていることが分かります。
+
+5. クラスタ内部でClusterIP Serviceを介してNGINX Podにアクセスできることを確認
+
+   今度は逆にApache PodからNGINXのClusterIP Serviceに対してアクセスしてみます。
+
+   ```bash
+   # Apache PodからNGINXのClusterIP Serviceに対してwgetを実行
+   # ちょっと長くなるのでタイトルだけ抽出
+   $ kubectl exec -n publish-app deploy/httpd -- http://nginx-clusterip/ | grep title
+   <title>Welcome to nginx!</title>
    
+   # ClusterIP　ServiceのIPアドレスを指定しても同じ動作になる
+   $ NGINX_CLUSTERIP=`kubectl get svc -n publish-app nginx-clusterip -ojsonpath='{.spec.clusterIP}'`
+   $ kubectl exec -n publish-app deploy/nginx -- http://${NGINX_CLUSTERIP}/ | grep title
+   <title>Welcome to nginx!</title>
+   
+   # nginxパスを指定するとマウントしたファイルが出力される
+   $ kubectl exec -n publish-app deploy/nginx -- http://httpd-clusterip/nginx/
+   Welcome to nginx!!
+   ```
 
-（作成中）
+6. PodのIPアドレスが変わってもServiceを介してアクセスできることを確認
 
-#### 4.5.4 NodePort Serviceでの公開（未）
+   今回はApache Podを削除してIPアドレスを変更したうえで、NGINX PodからApacheのClusterIP Serviceを介してアクセスしてみます。
 
-（作成中）
+   ```bash
+   # 現在のApache PodのIPアドレスを確認
+   $ kubectl get pod -n publish-app httpd -owide -l app=httpd
+   NAME                     READY   STATUS    RESTARTS   AGE   IP             NODE                 NOMINATED NODE   READINESS GATES
+   httpd-55584fd454-nj791   1/1     Running   0          10m   10.244.2.293   raspi-k8s-worker02   <none>           <none>
+   
+   # Apache Podを削除
+   $ kubectl delete pod -n publish-app -l app=httpd
+   pod "httpd-55584fd454-nj791" deleted
+   
+   # Apache Podが再作成され、IPアドレスが変わっていることを確認
+   $ kubectl get pod -n publish-app httpd -owide -l app=httpd
+   NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                 NOMINATED NODE   READINESS GATES
+   httpd-55584fd454-hx9bs   1/1     Running   0          2m13s   10.244.2.94   raspi-k8s-worker02   <none>           <none>
+   
+   # NGINX PodからApacheのClusterIP Serviceに対してwgetを実行
+   $ kubectl exec -n publish-app deploy/nginx -- http://httpd-clusterip/
+   <html><body><h1>It works!</h1></body></html>
+   ```
 
-#### 4.5.5 Ingressでの公開
+このようにPodが追加・削除されてもClusterIP Serviceが稼働中のPodに転送してくれるため、PodのIPアドレスに依存することなくアクセスすることができます。
 
-Ingressを有効化することで、クラスタ外部からのアクセスやトラフィック制御、ロードバランスなどが可能になります。
+#### 4.5.4 NodePort Serviceでの公開
 
-以降の作業はMasterノードで実施してください。
+次にクラスタ外部からアプリケーションにアクセスできるようNodePort Serviceを作成し、その動作を確認します。
 
-1. Nginx Ingress Controllerをデプロイ
+1. ApacheのNodePort Serviceをデプロイ
+
+   ```bash
+   # ApacheのNodePort Serviceのマニフェストを確認
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/apache-nodeport.yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: httpd-nodeport
+     namespace: publish-app
+   spec:
+     ports:
+     - port: 80
+       protocol: TCP
+       targetPort: 80
+     selector:
+       app: httpd
+     type: NodePort
+   ```
+
+   ```bash
+   $ kubectl apply -f ./4.5/apache-nodeport.yaml
+   service/httpd-nodeport created
+   ```
+
+2. NGINXのNodePort Serviceをデプロイ
+
+   ```bash
+   # NGINXのNodePort Serviceのマニフェストを確認
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/nginx-nodeport.yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: nginx-nodeport
+     namespace: publish-app
+   spec:
+     ports:
+     - port: 80
+       protocol: TCP
+       targetPort: 80
+     selector:
+       app: nginx
+     type: NodePort
+   ```
+
+   ```bash
+   $ kubectl apply -f ./4.5/nginx-nodeport.yaml
+   service/nginx-nodeport created
+   ```
+
+3. NodePort Serviceの一覧を確認
+
+   ClusterIP Serviceと異なり、PORT(S)列にNodePortが表示されていることが分かる。
+
+   下記の結果の場合だと、Apacheにアクセスするには `http://<NodeのIPアドレス>:30357` 、NGINXにアクセスするには `http://<NodeのIPアドレス>:32579` を指定すればよい。
+
+   ```bash
+   $ kubectl get service -n publish-app | grep -E "NAME|NodePort"
+   NAME             TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+   httpd-nodeport   NodePort   10.104.98.89    <none>        80:30357/TCP   2m1s
+   nginx-nodeport   NodePort   10.103.244.92   <none>        80:32579/TCP   112s
+   ```
+
+4. クラスタ外部からApacheにアクセスできることを確認
+
+   今回はクラスタ外部からアクセスするクライアントとして、iPhoneのブラウザ（SafariでもEdgeでも可）を使用します。
+
+   iPhoneのブラウザでApache(`http://172.20.10.2:30357`)にアクセス。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210823201610949.png" alt="image-20210823201610949" style="zoom:80%;" />
+
+   ちなみに指定するNodeのIPアドレスを変更しても同じページにアクセスできます。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210823201629316.png" alt="image-20210823201629316" style="zoom:80%;" />
+
+5. クラスタ外部からNGINXにアクセスできることを確認
+
+   iPhoneのブラウザでNGINX(`http://172.20.10.2:32579`)にアクセス。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210823202035965.png" alt="image-20210823202035965" style="zoom:80%;" />
+
+   同様に指定するNodeのIPアドレスを変更しても同じページにアクセスできます。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210823202125293.png" alt="image-20210823202125293" style="zoom:80%;" />
+
+これでNodePort Serviceを用いてクラスタ外部にアプリケーションを公開できました。
+
+#### 4.5.5 Ingressでの公開（未）
+
+最後にIngressを使うことで、より柔軟にアプリケーションを外部公開できることを確認していきます。
+
+1. NGINX Ingress Controllerをデプロイ
+
+   Ingressを使用できるようにするために、NGINX Ingress Controllerをデプロイします。
 
    ```bash
    $ kubectl apply -f \
@@ -1767,42 +1909,43 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
    ingress-nginx-admission-patch-ph5th          0/1     Completed   1          2m15s
    ingress-nginx-controller-55bc4f5565-p2mh4   1/1     Running     0          2m15s
    ```
-   
+
    `ingress-nginx-admission-create-xxxxx` Podや`ingress-nginx-admission-patch-xxxxx` PodがCrashLoopBackOffとなる場合は、すべてのノードを再起動した上で以下のコマンドを実行します。
-   
+
    ```bash
    $ kubectl replace --force -f \
    https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/baremetal/deploy.yaml
    ```
-   
+
    上記コマンドを実行したら、再度PodがReadyになるまで待機する。
-   
-3. Ingressを作成
+
+3. パスでルーティングするようなIngressを作成
 
    ```bash
    # Ingressのマニフェストを確認
    $ cd ~/raspi-k8s-training/manifests/
-   $ cat ./4.5/ingress-test.yaml
-   apiVersion: extensions/v1beta1
+   $ cat ./4.5/ingress-path.yaml
+   apiVersion: networking.k8s.io/v1
    kind: Ingress
    metadata:
-     name: ingress-test
+     name: ingress-path
+     namespace: publish-app
    spec:
      rules:
      - http:
          paths:
          - path: /nginx
            backend:
-             serviceName: nginx
+             serviceName: nginx-clusterip
              servicePort: 80
          - path: /httpd
            backend:
-             serviceName: httpd
+             serviceName: httpd-clusterip
              servicePort: 80
    ```
 
    ```bash
-   $ kubectl apply -f ./4.5/ingress-test.yaml
+   $ kubectl apply -f ./4.5/ingress-p.yaml
    ```
 
 4. Nginx Ingress ControllerのNodePort Serviceを確認
