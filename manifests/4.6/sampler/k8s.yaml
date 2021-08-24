@@ -64,7 +64,7 @@ gauges:
     sample: echo 0
 textboxes:
 - title: Status
-  position: [[0, 18], [80, 23]]
+  position: [[0, 18], [80, 22]]
   rate-ms: 30000
   sample: >-
     kubectl top node > /tmp/kube-node;
