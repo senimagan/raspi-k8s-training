@@ -2013,83 +2013,127 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
 デフォルトの状態ではKubernetesクラスタのメトリクスを取得することができないため、**metrics-server**をデプロイします。
 **metrics-server**をデプロイすることで、`kubectl top`コマンドを用いてKubernetesクラスタのメトリクスを収集できるようになります。
 
-1. (Master) `kubectl top`が動作しないことを確認
+1. `kubectl top`が動作しないことを確認
 
    ```bash
-   $ kubectl top node
-   W0824 15:20:51.901684   19176 top_node.go:119] Using json format to get metrics. Next release will switch to protocol-buffers, switch early by passing --use-protocol-buffers flag
+   $ kubectl top node --use-protocol-buffers
    error: Metrics API not available
    ```
 
-2. (Master) metrics-serverをデプロイ
+2. metrics-serverをデプロイ
 
    ```bash
    $ cd ~/raspi-k8s-training/manifests/
-   $ kubectl apply -f ./4.6/metrics-server/manifests/base/
+   $ kubectl apply -f ./4.6/metrics-server/components.yaml
+   serviceaccount/metrics-server created
+   clusterrole.rbac.authorization.k8s.io/system:aggregated-metrics-reader created
+   clusterrole.rbac.authorization.k8s.io/system:metrics-server created
+   rolebinding.rbac.authorization.k8s.io/metrics-server-auth-reader created
+   clusterrolebinding.rbac.authorization.k8s.io/metrics-server:system:auth-delegator created
+   clusterrolebinding.rbac.authorization.k8s.io/system:metrics-server created
+   service/metrics-server created
+   deployment.apps/metrics-server created
+   apiservice.apiregistration.k8s.io/v1beta1.metrics.k8s.io created
    ```
 
-5. (Master) metrics-serverが正常にデプロイされたことを確認
+3. metrics-serverのPodがReadyになるまで待機
 
    ```bash
-   $ kubectl get pod -n kube-system | grep metrics-server
-   metrics-server-xxxxxxxxxx-yyyyy   1/1     Running   0          1m
+   # metrics-serverのPodがReadyになるまで待機
+   $ kubectl wait pod -n kube-system -l k8s-app=metrics-server --for=condition=Ready --timeout=5m
+   pod/metrics-server-5cd859f5c-t77s5 condition met
+   
+   # metrics-serverのPodがReadyになっていることを確認
+   $ kubectl get pod -n kube-system -l k8s-app=metrics-server
+   NAME                             READY   STATUS    RESTARTS   AGE
+   metrics-server-5cd859f5c-t77s5   1/1     Running   0          3m2s
    ```
 
-6. (Master) `kubectl top`が機能することを確認
+6. `kubectl top`が機能することを確認
 
    ```bash
-   $ kubectl top node
+   $ kubectl top node --use-protocol-buffers
    NAME                 CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
-   raspi-k8s-master     388m         9%     570Mi           14%
-   raspi-k8s-worker01   179m         4%     320Mi           8%
-   raspi-k8s-worker02   193m         4%     303Mi           7%
+   raspi-k8s-master     556m         13%    735Mi           19%
+   raspi-k8s-worker01   234m         5%     380Mi           10%
+   raspi-k8s-worker02   232m         5%     278Mi           7%
    ```
 
-   以下が出力される場合は、しばらくしてから再度実行してみる
+   以下が出力される場合は、しばらくしてから再度実行してみましょう。
 
    ```bash
    $ kubectl top node
-   error: metrics not available yet
+   Error from server (ServiceUnavailable): the server currently unable to handle the request (get node.metrics.k8s.io)
    ```
+
+このように metrics-server をデプロイすることで、NodeのCPU/メモリ使用率を監視できるようになります。
+また、`kubectl top pod --use-protocol-buffers -A`を実行するとすべてのPodのCPU/メモリ使用率を監視できます。
 
 #### 4.6.2 メトリクスの可視化（未）
 
-SamplerというOSSを用いて、Masterに接続したディスプレイにKuberntesクラスタのメトリクスを表示できるようにする。
+次に取得したメトリクスを可視化していきます。
+今回は [Sampler](https://github.com/sqshq/sampler) というシェルコマンドの結果を可視化できるツールを使用します。
 
-この手順は
+以降の手順は、Masterに接続したディスプレイにKuberntesクラスタのメトリクスを表示できるようにする。
 
-1. (Master) プロジェクトをクローン
-   @reireias氏が[sampler](https://github.com/sqshq/sampler)プロジェクトをフォークし、Arm用に改変したものを利用する。
+この手順は？？？？？？？？？？？
 
+1. (Master) Samplerのリポジトリをクローン
+   
+   [sqshq/sampler](https://github.com/sqshq/sampler)はRaspberry PiのようなArmアーキテクチャのCPUには対応していないため、@reireias氏がArm用に修正した[reireias/sampler](https://github.com/reireias/sampler) を利用する。
+   
    ```bash
+   $ cd ~/
    $ git clone https://github.com/reireias/sampler.git
    ```
-
+   
 2. (Master) Go言語をインストール
 
+   SamplerをArm用にビルドするためにGo言語をインストールします。
+
    ```bash
-   $ sudo apt install golang
+   $ sudo apt install -y golang
    ```
 
-3. (Master) samplerをビルド
+3. (Master) Arm用のsamplerをビルド
 
    ```bash
    $ cd ~/sampler
    $ GOOS=linux GOARCH=arm GOARM=7 go build
    ```
 
-4. (Master) パスが通っている場所にsamplerを移動
+   ビルドが成功していれば、`sampler` というバイナリが作成されています。
 
    ```bash
-   $ sudo mv ~/sampler/sampler /usr/bin
+   $ ls -l sampler
+   -rwxr-xr-x 1 tarte tarte 4569556 Aug 24 17:50 sampler
+   ```
+
+4. (Master) `sampler`のバイナリをパスが通っている場所に移動
+
+   ```bash
+   # samplerにパスを通す
+   $ sudo mv ~/sampler/sampler /usr/local/bin
+   
+   # パスが通ったことを確認
+   $ sampler --version
+   1.1.0
    ```
 
 5. (Master) samplerの設定ファイルをコピー
 
    ```bash
+   # samplerの設定ファイルディレクトリを作成
    $ sudo mkdir /etc/sampler
+   
+   # samplerの設定ファイルをコピー
    $ cd ~/raspi-k8s-training/manifests/
    $ sudo cp ./4.6/sampler/k8s.yaml /etc/sampler/k8s.yaml
+   
+   # コピーされていること確認
+   $ ls -l /etc/sampler
+   total 4
+   -rw-r--r-- 1 root root 2313 Aug 24 17:57 k
    ```
 
 6. (Master) `sampler`を実行し、表示を確認

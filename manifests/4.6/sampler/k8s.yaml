@@ -77,4 +77,4 @@ textboxes:
     "Replicaset:$(cat /tmp/kube-all | grep replicaset.apps/ | wc -l)";
     echo "";
     echo "Service";
-    kubectl get svc --no-headers | grep -v ClusterIP | awk '{print $1, $4, $5}' | column -t;
+    kubectl get svc --no-headers -A | grep -v ClusterIP | awk '{print $1, $4, $5}' | column -t;
