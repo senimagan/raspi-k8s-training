@@ -6,7 +6,7 @@ metadata:
   namespace: publish-app
   annotations:
     nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: 20
+    nginx.ingress.kubernetes.io/canary-weight: "20"
 spec:
   rules:
   - http:
