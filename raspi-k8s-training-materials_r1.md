@@ -1936,16 +1936,18 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
          paths:
          - path: /nginx
            backend:
-             serviceName: nginx-clusterip
-             servicePort: 80
+             service: 
+               name: nginx-clusterip
+               port: 80
          - path: /httpd
            backend:
-             serviceName: httpd-clusterip
-             servicePort: 80
+             service:
+               name: httpd-clusterip
+               port: 80
    ```
 
    ```bash
-   $ kubectl apply -f ./4.5/ingress-p.yaml
+   $ kubectl apply -f ./4.5/ingress-path.yaml
    ```
 
 4. Nginx Ingress ControllerのNodePort Serviceを確認

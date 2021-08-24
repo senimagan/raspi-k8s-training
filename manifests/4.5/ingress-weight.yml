@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-path
+  name: ingress-weight
   namespace: publish-app
   annotations:
     nginx.ingress.kubernetes.io/service-weight: |
@@ -12,9 +12,11 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: nginx-clusterip
-          servicePort: 80
+          service: 
+            name: nginx-clusterip
+            port: 80
       - path: /
         backend:
-          serviceName: httpd-clusterip
-          servicePort: 80
+          service:
+            name: httpd-clusterip
+            port: 80

@@ -9,9 +9,11 @@ spec:
       paths:
       - path: /nginx
         backend:
-          serviceName: nginx-clusterip
-          servicePort: 80
+          service: 
+            name: nginx-clusterip
+            port: 80
       - path: /httpd
         backend:
-          serviceName: httpd-clusterip
-          servicePort: 80
+          service:
+            name: httpd-clusterip
+            port: 80
