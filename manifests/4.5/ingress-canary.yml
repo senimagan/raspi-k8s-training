@@ -6,8 +6,7 @@ metadata:
   namespace: publish-app
 spec:
   rules:
-  - host: canary.example.com
-    http:
+  - http:
       paths:
       - path: /
         pathType: Prefix
@@ -27,8 +26,7 @@ metadata:
     nginx.ingress.kubernetes.io/canary-weight: "75"
 spec:
   rules:
-  - host: canary.example.com
-    http:
+  - http:
       paths:
       - path: /
         pathType: Prefix
@@ -37,4 +35,3 @@ spec:
             name: nginx-clusterip
             port:
               number: 80
-
