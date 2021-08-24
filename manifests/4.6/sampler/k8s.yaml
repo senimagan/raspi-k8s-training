@@ -11,7 +11,7 @@ gauges:
   min:
     sample: echo 0
 - title: raspi-k8s-worker01 CPU
-  position: [[0, 7], [40, 6]]
+  position: [[0, 6], [40, 6]]
   rate-ms: 30000
   color: 13
   percent-only: true
@@ -22,7 +22,7 @@ gauges:
   min:
     sample: echo 0
 - title: raspi-k8s-worker02 CPU
-  position: [[0, 13], [40, 6]]
+  position: [[0, 12], [40, 6]]
   rate-ms: 30000
   color: 14
   percent-only: true
@@ -43,7 +43,7 @@ gauges:
   min:
     sample: echo 0
 - title: raspi-k8s-worker01 Mem
-  position: [[40, 7], [40, 6]]
+  position: [[40, 6], [40, 6]]
   rate-ms: 30000
   color: 13
   cur:
@@ -53,7 +53,7 @@ gauges:
   min:
     sample: echo 0
 - title: raspi-k8s-worker02 Mem
-  position: [[40, 13], [40, 6]]
+  position: [[40, 12], [40, 6]]
   rate-ms: 30000
   color: 14
   cur:
@@ -64,7 +64,7 @@ gauges:
     sample: echo 0
 textboxes:
 - title: Status
-  position: [[0, 19], [80, 23]]
+  position: [[0, 18], [80, 23]]
   rate-ms: 30000
   sample: >-
     kubectl top node > /tmp/kube-node;
@@ -77,4 +77,4 @@ textboxes:
     "Replicaset:$(cat /tmp/kube-all | grep replicaset.apps/ | wc -l)";
     echo "";
     echo "Service";
-    kubectl get svc --no-headers -A | grep -v ClusterIP | awk '{print $1, $4, $5}' | column -t;
+    kubectl get svc -A | grep -v ClusterIP | awk '{print $1, $2, $3, $6}' | column -t;
