@@ -76,5 +76,5 @@ textboxes:
     "Deployment:$(cat /tmp/kube-all | grep deployment.apps/ | wc -l)"
     "Replicaset:$(cat /tmp/kube-all | grep replicaset.apps/ | wc -l)";
     echo "";
-    echo "Service";
-    kubectl get svc -A | grep -v ClusterIP | awk '{print $1, $2, $3, $6}' | column -t;
+    echo "NodePort Service";
+    kubectl get svc -A | grep -v ClusterIP | awk '{print $2, $6}' | column -t;

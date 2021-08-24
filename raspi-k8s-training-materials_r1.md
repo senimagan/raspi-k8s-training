@@ -2133,10 +2133,12 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
    # コピーされていること確認
    $ ls -l /etc/sampler
    total 4
-   -rw-r--r-- 1 root root 2313 Aug 24 17:57 k
+   -rw-r--r-- 1 root root 2313 Aug 24 17:57 k8s.yaml
    ```
 
 6. (Master) `sampler`を実行し、表示を確認
+
+   `sampler` は、 `Ctrl+C` もしくは `q` を入力すれば終了します。
 
    ```bash
    $ sampler -c /etc/sampler/k8s.yaml
@@ -2144,93 +2146,158 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
 
 
 
-#### 4.6.3 （おまけ）小型ディスプレイへのメトリクスの表示（未）
+#### 4.6.3 （おまけ）小型ディスプレイの設定（未）
 
 小型ディスプレイを使用するために、LCDドライバを設定します。本作業は小型ディスプレイを接続するノードのみに実施します。
 
-1. ディスプレイ用のプロジェクトをclone
+1. Masterノードと小型ディスプレイを接続
+
+   ＜写真を追加＞
+   
+   ここに小さなスイッチがあるので左側にスライドしてスイッチをONにしてください。
+
+   正常に接続されている状態で、Raspberry Piに電源が供給されていれば、写真のように小型ディスプレイが発光します。
+
+2. ディスプレイドライバのリポジトリをクローン
 
    ```bash
+   $ cd ~/
    $ git clone https://github.com/kedei/LCD_driver
    ```
 
-   カレントディレクトリに **LCD_driver** が展開されたことを確認
+3. ディレクトリの権限を変更
 
    ```bash
-   $ ls -l | grep LCD_driver
-   drwxr-xr-x 6 tarte tarte 4096 Aug Jul 29 17:16 LCD_driver
-   ```
+   #ディレクトリの権限を(drwxrwxrwx)に変更
+   $ sudo chmod -R 777 ~/LCD_driver
    
-2. 権限を付与
-
-   ```bash
-   $ sudo chmod -R 777 LCD_driver
-   
-   #権限が(drwxrwxrwx)に変更されたことを確認
+   #権限が変更されたことを確認
    $ ls -l | grep LCD_driver
-   drwxrwxrwx 6 tarte tarte 4096 Aug Jul 29 17:16 LCD_driver
+   drwxrwxrwx 6 tarte tarte 4096 Aug 24 17:16 LCD_driver
    ```
 
-3. `LCD_driver`ディレクトリに移動
+4. LCDドライバの設定を変更
+
+   このままだと小型ディスプレイに切り替えた際に、cgroupsのmemoryサブシステムが無効になってしまうので、そうならないようにLCDドライバの設定を変更します。
 
    ```bash
-   $ cd LCD_driver
+   # LCDドライバの設定を変更
+   # memoryサブシステムを有効化する記述を追記
+   $ sed -i "s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/" \
+   ~/LCD_driver/boot/cmdline.txt
+   
+   # 追記できたことを確認
+   $ cat ~/LCD_driver/boot/cmdline.txt
+   dwc_otg.lpm_enable=0 console=tty1 console=ttyAMA0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait fbcon=map:10 fbcon=font:ProFont6x11 log.nologo cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
    ```
 
-4. LCDドライバをインストール
+5. `LCD_driver`ディレクトリに移動
 
    ```bash
-   $ ./LCD35_show
+   $ cd ~/LCD_driver
    ```
 
-   【補足内容】 
-   LCDドライバインストール後に再起動が実行されます。 
-   インストール後、以下方法でHDMI接続ディスプレイ表示 <==> 3.5インチディスプレイの切替が可能ですが、両ディスプレイを同時には利用できません。  
+6. 小型ディスプレイに表示を切り替え
 
-   - 3.5インチディスプレイ表示切替
+   以下のコマンドを実行すると再起動が実行されます。
+
+   ```bash
+   $ sudo ./LCD35_show
+   ```
+
+   以下のようなメッセージが表示される場合は、 `y` を入力してください。
+
+   ```bash
+   Do you want to continue? [Y/n]
+   ```
+
+   再起動が完了すると、小型ディスプレイにコマンドラインが表示されているはずです。
+   表示が崩れている場合は、小型ディスプレイを接続し直して再起動してみてください
+
+これで小型ディスプレイにコマンドラインを表示されることができたと思います。
+小型ディスプレイだと表示領域が狭いかもしれませんが、通常のディスプレイと同様に操作可能です。
+
+HDMI接続ディスプレイと小型ディスプレイを切り替えることは可能ですが、両ディスプレイを同時に利用することはできません。
+HDMI接続ディスプレイと小型ディスプレイを切り替えたい場合は以下のコマンドを実行してください。
+
+   - **HDMI接続ディスプレイ → 小型ディスプレイ表示切替**
 
      ```bash
      $ cd ~/LCD_driver
+     # コマンド実行後に再起動され、小型ディスプレイ側で表示されます
      $ sudo ./LCD35_show
-     # コマンド実行後に再起動され、3.5インチディスプレイ側で起動表示されます
      ```
 
-   - HDMIディスプレイ表示切替
+   - **小型ディスプレイ → HDMI接続ディスプレイ表示切替**
 
      ```bash
      $ cd ~/LCD_driver
+     # コマンド実行後に再起動され、HDMI接続ディスプレイ側で表示されます
      $ sudo ./LCD_hdmi
-     # コマンド実行後に再起動され、HDMIディスプレイ側で起動表示されます
      ```
 
 #### 4.6.4（おまけ）samplerの起動時自動実行設定（未）
 
-1. (Master) 以下のコマンドを実行し、`~/.profile`に追記
+小型ディスプレイを接続したMasterノードが起動した際に、自動的に `sampler` を実行してメトリクスを表示できるようにしていきます。
+
+小型ディスプレイのままでは操作しにくいので、WorkerノードからSSH経由でMasterノードの設定を行っていきます。
+
+1. (Worker01) キーボードとHDMIケーブルをWorker01に接続
+
+   Worker01のコマンドラインがHDMIディスプレイに表示されること、キーボード入力可能であることを確認して下さい。
+   
+2. (Worker01) SSHでMasterノードにアクセス
+
+   ```bash
+   tarte@raspi-k8s-worker01:~ $ ssh tarte@raspi-k8s-master.local
+   tarte@raspi-k8s-master.local's password: <パスワードを入力>
+   Linux raspi-k8s-master 5.10.17-v71+ #1421 SMP Thu May 27 14:00:13 BST 2021 armv71
+   
+   The programs included with the Debian GNU/Linux system are free software;
+   the exact distribution terms for each program are described in the
+   individual files in /usr/share/doc/*/copyright.
+   
+   Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+   permitted by applicable law.
+   Last login: Tue Aug 24 20:09:55 2021
+   
+   tarte@raspi-k8s-master:~ $
+   ```
+
+   以下のようなメッセージが表示される場合は `yes` を入力してください。
+
+   ```bash
+   Are you sure you want to continue connecting (yes/no)? <yesを入力>
+   ```
+
+   
+
+3. (Master) 以下のコマンドを実行し、`~/.profile`に追記
 
    ```bash
    $ echo 'if [ $(tty) == "/dev/tty1" ]; then sampler -c /etc/sampler/k8s.yaml; fi' >> ~/.profile
    ```
 
-   これでログイン時に自動でsamplerを実行してくれるようになる
+   これでログイン時に自動で`sampler`を実行してくれるようになる
    ただし、ログインは自動化されないので、以降の手順で自動ログインを有効にしていく
 
-2. (Master) `raspi-config`を実行
+4. (Master) `raspi-config`を実行
 
    ```bash
    $ sudo raspi-config
    ```
 
-3. `3 Boot Options`を選択
+5. `3 Boot Options`を選択
 
-4. `B1 Desktop / CLI`を選択
+6. `B1 Desktop / CLI`を選択
 
-5. `B2 Console Autologin`を選択
+7. `B2 Console Autologin`を選択
 
-6. `<Finish>`を選択
+8. `<Finish>`を選択
 
-7. 再起動の確認をされるので、`<Yes>`を選択
+9. 再起動の確認をされるので、`<Yes>`を選択
 
-8. Masterに接続されているディスプレイに、samplerが表示されていることを確認
+10. Masterに接続されているディスプレイに、samplerが表示されていることを確認
 
 
 
