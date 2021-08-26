@@ -2176,8 +2176,8 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
 
    ```bash
    $ cd ~/raspi-k8s-training/manifests
-   # resource-consumerに命令するスクリプトを実行
-   $ bash ./4.6/resource-consumer/putting-load.sh
+   # resource-consumerに命令するシェルスクリプトを実行
+   $ bash ./4.6/resource-consumer/consume-resources.sh
    ConsumeMem
    2000 megabytes
    180 durationSec
