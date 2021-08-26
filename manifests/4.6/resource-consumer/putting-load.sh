@@ -6,8 +6,8 @@ RC_PORT=`kubectl get svc resource-consumer -ojsonpath='{.spec.ports[0].nodePort}
     exit 1;
 }
 
-echo "Consume 2000 MB of memory for 3 minutes."
+# Consume 2000 MB of memory for 3 minutes.
 curl http://localhost:${RC_PORT}/ConsumeMem --data "megabytes=2000&durationSec=180"
 
-echo "Consume 1000 millicore (1 core) of CPU for 5 minutes."
-curl http://localhost:${RC_PORT}/ConsumeCPU --data "millicores=1000&durationSec=180"
+# Consume 1000 millicores (1 core) of CPU for 5 minutes.
+curl http://localhost:${RC_PORT}/ConsumeCPU --data "millicores=1000&durationSec=300"

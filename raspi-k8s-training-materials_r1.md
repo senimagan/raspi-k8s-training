@@ -2001,7 +2001,7 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 
 Ingress Controllerの種類にもよりますが、他にもカナリアリリースやSSL/TLS終端の設定、タイムアウトの設定など様々な設定が可能です。
 
-### 4.6 メトリクスの監視（未）
+### 4.6 メトリクスの監視
 
 実際にKubernetesを運用していくには、クラスタのCPU/メモリの使用量がどれくらいか、異常が発生しているPodがないかなど、様々なメトリクスを監視していく必要があります。
 本番環境などでは、[Prometheus](https://prometheus.io/) + [Grafana](https://grafana.com/)などのOSSを組み合わせたり、DataDogのような要監視サービスを使ったりして監視することが多いです。
@@ -2069,7 +2069,7 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
 このように metrics-server をデプロイすることで、NodeのCPU/メモリ使用率を監視できるようになります。
 また、`kubectl top pod --use-protocol-buffers -A`を実行するとすべてのPodのCPU/メモリ使用率を監視できます。
 
-#### 4.6.2 メトリクスの可視化（未）
+#### 4.6.2 メトリクスの可視化
 
 次に取得したメトリクスを可視化していきます。
 今回は [Sampler](https://github.com/sqshq/sampler) というシェルコマンドの結果を可視化できるツールを使用します。
@@ -2121,6 +2121,8 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
 
 5. (Master) samplerの設定ファイルをコピー
 
+   今回使用している設定ファイルでは、各ノードのCPU/メモリ使用率と各種リソースの数、NodePort Serviceの詳細を表示するようになっています。表示されるメトリクスは5秒ごとに更新されます。
+
    ```bash
    # samplerの設定ファイルディレクトリを作成
    $ sudo mkdir /etc/sampler
@@ -2137,15 +2139,17 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
 
 6. (Master) `sampler`を実行し、表示を確認
 
-   `sampler` は、 `Ctrl+C` もしくは `q` を入力すれば終了します。
-
    ```bash
    $ sampler -c /etc/sampler/k8s.yaml
    ```
-   
-7. (Master) `resource-consumer`をデプロイ
+
+   `sampler` は、 `Ctrl+C` もしくは `q` を入力すれば終了します。
+
+7. (Master) resource-consumerをデプロイ
 
    [resource-consumer](https://github.com/kubernetes/kubernetes/tree/master/test/images/resource-consumer) というCPUやメモリに負荷をかけられるコンテナアプリケーションを用いて実際にメトリクスが変動することを確認します。
+
+   まずは resource-consumer をデプロイします。
 
    ```bash
    # resource-consumerをデプロイし、NodePortで公開
@@ -2155,29 +2159,56 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
    service/resource-consumer created
    
    # resoruce-consumerがどのNodeにあるか確認
+   # 以下は実行例であり実際の結果と異なる場合があります
    $ kubectl get pod resource-consumer -owide | awk '{print $7}'
    NODE
    raspi-k8s-worker02
    ```
 
-8. (Master) `resource-consumer` でリソースを消費させる
+8. (Master) resource-consumer にリソースを消費させる
 
-   `resource-consumer` に以下を命令します。
+   シェルスクリプトを実行して、 resource-consumer がデプロイされているノードのリソースを消費させます。
 
-   - メモリを 2000MB 
+   シェルスクリプトでは、resource-consumer に対して以下のように命令しています。
+
+   - 3分間、メモリを2000 MB 消費し続ける
+   - 5分間、CPUを1000 millicores (1 core) 消費し続ける
 
    ```bash
-   # resource-consumerのNodePortを取得
-   $ RC_PORT=`kubectl get svc resource-consumer -ojsonpath='{.spec.ports[0].nodePort}'
-   
-   
+   $ cd ~/raspi-k8s-training/manifests
+   # resource-consumerに命令するスクリプトを実行
+   $ bash ./4.6/resource-consumer/putting-load.sh
+   ConsumeMem
+   2000 megabytes
+   180 durationSec
+   ConsumeCPU
+   1000 millicores
+   300 durationSec
    ```
 
-   
+9. (Master) `sampler`を実行し、メトリクスの推移を確認
+
+   `sampler`を実行してCPU使用率とメモリ使用率の推移を観察します。
+
+   この例では resource-consumer は `raspi-k8s-worker02` Nodeにデプロイされているため、`raspi-k8s-worker02` NodeのCPU使用率とメモリ使用率が変動します。
+
+   Raspberry Pi 4 Model Bは CPUが 40000 millicores (4 cores)、メモリが4000 MB (4 GB)なので、CPU使用率は25%以上、メモリ使用率は50%以上になると思います。
+
+   ```bash
+   $ sampler -c /etc/sampler/k8s.yaml
+   ```
+
+   `sampler` は、 `Ctrl+C` もしくは `q` を入力すれば終了します。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210826190858022.png" alt="image-20210826190858022" style="zoom: 75%;" />
+
+
 
 #### 4.6.3 （おまけ）小型ディスプレイの設定
 
-小型ディスプレイを使用するために、LCDドライバを設定します。
+samplerでメトリクスを可視化することができたので、これを小型ディスプレイに表示できるようにしていきます。
+
+まずは小型ディスプレイを使用するために、LCDドライバを設定します。
 
 **本作業は小型ディスプレイをMasterノードに接続している前提で進めていきます。**
 小型ディスプレイをWorkerに接続している場合でも、実行するノードを読み替えれば問題なく設定できます。
@@ -2261,7 +2292,7 @@ HDMI接続ディスプレイと小型ディスプレイを切り替えたい場�
      ```bash
      $ cd ~/LCD_driver
      # コマンド実行後に再起動され、HDMI接続ディスプレイ側で表示されます
-     $ sudo ./LCD_hdmi
+     $ sudo ./LCD35_hdmi
      ```
 
 #### 4.6.4（おまけ）samplerの起動時自動実行設定
@@ -2344,7 +2375,9 @@ HDMI接続ディスプレイと小型ディスプレイを切り替えたい場�
 
    Masterノードに接続されている小型ディスプレイにメトリクスが表示されていることを確認しましょう。
 
-   ＜写真を追加＞
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210826191229173.png" alt="image-20210826191229173" style="zoom: 67%;" />
+
+
 
 ## おわりに
 
