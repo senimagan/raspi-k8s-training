@@ -78,5 +78,6 @@ textboxes:
     "ds:$(cat /tmp/kube-all | grep daemonset.apps/ | wc -l)"
     "sts:$(cat /tmp/kube-all | grep daemonset.apps/ | wc -l)"
     "svc:$(cat /tmp/kube-all | grep service/ | wc -l)";
+    echo "";
     echo "NodePort Services:";
     kubectl get svc -A --no-headers | grep -v ClusterIP | awk '{print $2, $6}' | column -t;
