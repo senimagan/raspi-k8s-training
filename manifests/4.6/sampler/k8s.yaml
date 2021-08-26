@@ -72,12 +72,11 @@ textboxes:
   sample: >-
     kubectl top node > /tmp/kube-node;
     kubectl get all --all-namespaces > /tmp/kube-all;
-    echo "Pod:$(cat /tmp/kube-all | grep pod/ | grep 'Running' | wc -l)"
-    "Service:$(cat /tmp/kube-all | grep service/ | wc -l)"
-    "Daemonset:$(cat /tmp/kube-all | grep daemonset.apps/ | wc -l)"
-    "Statefulset:$(cat /tmp/kube-all | grep daemonset.apps/ | wc -l)"
-    "Deployment:$(cat /tmp/kube-all | grep deployment.apps/ | wc -l)"
-    "Replicaset:$(cat /tmp/kube-all | grep replicaset.apps/ | wc -l)";
-    echo "";
-    echo "NodePort Service";
+    echo "pod:$(cat /tmp/kube-all | grep pod/ | grep 'Running' | wc -l)"
+    "rs:$(cat /tmp/kube-all | grep replicaset.apps/ | wc -l)"
+    "deploy:$(cat /tmp/kube-all | grep deployment.apps/ | wc -l)"
+    "ds:$(cat /tmp/kube-all | grep daemonset.apps/ | wc -l)"
+    "sts:$(cat /tmp/kube-all | grep daemonset.apps/ | wc -l)"
+    "svc:$(cat /tmp/kube-all | grep service/ | wc -l)";
+    echo "NodePort Services:";
     kubectl get svc -A --no-headers | grep -v ClusterIP | awk '{print $2, $6}' | column -t;
