@@ -37,7 +37,7 @@ gauges:
     sample: echo 0
 - title: raspi-k8s-master Mem
   position: [[40, 0], [40, 6]]
-  rate-ms: 30000
+  rate-ms: 5000
   color: 10
   cur:
     sample: cat /tmp/kube-node | grep raspi-k8s-master | awk '{print $4}' | tr -d "Mi" | grep -v "unknown" || echo -1
@@ -68,7 +68,7 @@ gauges:
 textboxes:
 - title: Status
   position: [[0, 18], [80, 22]]
-  rate-ms: 5000
+  rate-ms: 4000
   sample: >-
     kubectl top node --use-protocol-buffers > /tmp/kube-node;
     kubectl get all --all-namespaces > /tmp/kube-all;
