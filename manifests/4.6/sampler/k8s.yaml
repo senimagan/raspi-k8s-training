@@ -60,7 +60,7 @@ gauges:
   rate-ms: 5000
   color: 14
   cur:
-    sample: cat /tmp/kube-node | grep raspi-k8s-worker02 | awk '{print $4}' | tr -d "Mi" | grep -v "unknown" || echo -1
+    sample: kubectl top node raspi-k8s-worker02 --no-headers --use-protocol-buffers | awk '{print $4}' | tr -d "Mi" | grep -v "unknown" || echo -1
   max:
     sample: echo 4096
   min:
