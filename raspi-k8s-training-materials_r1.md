@@ -1457,7 +1457,7 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
 
 Podがいくつかのノードに偏ってしまうと、負荷がかかってパフォーマンスが下がったり、単一障害点(SPOF)になったりする可能性があります。そのような状態を避けるために、Podを常にバランスよく分散させる [kube-descheduler](https://github.com/kubernetes-sigs/descheduler/tree/master) という機能も開発されています。
 
-### 4.5 アプリケーションの公開（未）
+### 4.5 アプリケーションの公開
 
 これまでの作業でアプリケーションはデプロイできましたが、現在の状態ではクラスタ外部からアプリケーションにアクセスすることができません。
 
@@ -2143,7 +2143,19 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
    $ sampler -c /etc/sampler/k8s.yaml
    ```
    
-7. メトリクス
+7. メトリクスが変動することを確認
+
+   [resource-consumer](https://github.com/kubernetes/kubernetes/tree/master/test/images/resource-consumer) というCPUやメモリに負荷をかけられるコンテナアプリケーションを用いて実際にメトリクスが変動することを確認します。
+
+   ```bash
+   # resource-consumerをデプロイ
+   $ kubectl run resource-consumer --image=gcr.io/k8s-staging-e2e-test-images/resource-consumer:1.10-linux-arm --port=8080
+   
+   # resource-consumerをNodePortで公開
+   $ kubectl expose pod r
+   ```
+
+   
 
 #### 4.6.3 （おまけ）小型ディスプレイの設定
 
