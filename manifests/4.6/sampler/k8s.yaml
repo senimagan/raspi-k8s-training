@@ -70,7 +70,7 @@ textboxes:
   position: [[0, 18], [80, 22]]
   rate-ms: 5000
   sample: >-
-    kubectl top node > /tmp/kube-node;
+    kubectl top node --use-protocol-buffers > /tmp/kube-node;
     kubectl get all --all-namespaces > /tmp/kube-all;
     echo "pod:$(cat /tmp/kube-all | grep pod/ | grep 'Running' | wc -l)"
     "rs:$(cat /tmp/kube-all | grep replicaset.apps/ | wc -l)"
