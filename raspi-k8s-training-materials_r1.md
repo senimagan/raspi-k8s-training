@@ -48,29 +48,33 @@ section 4.教材返却
 
 使用した機材は、ハンズオン研修終了後 翌2日以内に同梱されている着払い伝票（ゆうパック）にて返却してください。
 
-
-
 ## 1. 事前準備
 
 Kubernetesを構築する前に、必要機材の確認やハードウェアなどの準備を行います。
 
 ### 1.1 必要機材の確認
 
-受け取った教材に、以下の機材が同梱されていることを確認してください。
-教材に不備・不足などあった場合は速やかに事務局(managed-paas@sdb.jp.nec.com)までご連絡ください。
+受け取った教材一式を開封してください。段ボールや緩衝材は返送時に使用するので保管しておいてください。
 
-| 機材名                                | 個数 | 説明                                                         |
-| ------------------------------------- | ---- | ------------------------------------------------------------ |
-| Raspberry Pi 4 Model B (4GB RAM)      | 3    | サーバとして使用                                             |
-| microSDカード                         | 4    | Raspberry Piのストレージとして使用。<br />OSインストール済み。1枚は予備。 |
-| ACアダプタ                            | 3    | Raspberry Piの電源供給に使用                                 |
-| 充電用USB Type-Cケーブル （3個入）    | 1    | Raspberry Piの電源供給に使用                                 |
-| 電源タップ                            | 1    | Raspberry Piの電源供給に使用                                 |
-| Stackable Acrylic Case                | 1    | Raspberry Pi用の積層ケース                                   |
-| HDMI - microHDMI変換アダプタ          | 1    | Raspberry Piの映像出力をHDMIに変換するために使用             |
-| OSOYOO 3.5" Raspberry Pi Touch Screen | 1    | Raspberry Pi用の小型ディスプレイ                             |
+<img src="raspi-k8s-training-materials_r1.assets/image-20210826091852098.png" alt="image-20210826091852098" style="zoom:67%;" />
 
+開封した教材一式の中に以下の必要機材が揃っていることを確認してください。
 
+<img src="raspi-k8s-training-materials_r1.assets/image-20210826093555488.png" alt="image-20210826093555488" style="zoom:70%;" />
+
+| No.  | 機材名                                | 個数 | 説明                                                         |
+| :--: | ------------------------------------- | :--: | ------------------------------------------------------------ |
+|  1   | ACアダプタ                            |  3   | Raspberry Piの電源供給に使用                                 |
+|  2   | HDMI - microHDMI変換アダプタ          |  1   | Raspberry Piの映像出力をHDMIに変換するために使用             |
+|  3   | 充電用USB Type-Cケーブル （3個入）    |  1   | Raspberry Piの電源供給に使用                                 |
+|  4   | microSDカード                         |  4   | Raspberry Piのストレージとして使用。<br />OSインストール済み。1枚は予備。 |
+|  5   | Raspberry Pi 4 Model B (4GB RAM)      |  3   | Kubernetesのノード（サーバ）として使用                       |
+|  6   | OSOYOO 3.5" Raspberry Pi Touch Screen |  1   | Raspberry Pi用の小型ディスプレイ                             |
+|  7   | Stackable Acrylic Case                |  1   | Raspberry Pi用の積層ケース                                   |
+|  8   | 電源タップ                            |  1   | Raspberry Piの電源供給に使用                                 |
+|  9   | 返送用着払い伝票（ゆうパック）        |  1   | 研修完了後の教材の返送に使用                                 |
+
+教材一式に不備・不足などあった場合は速やかに事務局(managed-paas@sdb.jp.nec.com)までご連絡ください。
 
 また、以下の機材については受講者各自でご用意ください。
 
@@ -82,21 +86,17 @@ Kubernetesを構築する前に、必要機材の確認やハードウェアな�
 | 社有iPhone                 | 1    | Raspberry Pi同士の接続およびインターネットアクセスに使用 |
 | シンクラ端末(SS10など)     | 1    | 本資料の参照やトラブルシュート時の調査・情報収集に使用   |
 
-### 1.2 Raspberry Piのラック組み立て
+### 1.2 Raspberry Piラックの組み立て
 
-Raspberry Piと積層ケースを開封しラックを組み立てます。
+補足資料「物理層の各種手順」の「Raspberry Piラックの組み立て手順」を参照してラックを組み立てて下さい。
 
-多少機材が異なりますが、以下サイトを参考に組み立ててください。
-https://developers.cyberagent.co.jp/blog/archives/14721/
-
-下から1段目は空にして、2~4段目にRaspberry Piを配置すると取り回しやすくなります。
 **この時点では小型ディスプレイは接続しないでください。**
 
-以下はmicroSDをセットする前のRaspberry Piのイメージ図です。
+以下はmicroSDカードをセットする前のRaspberry Piのイメージ図です。
 
 <img src="raspi-k8s-training-materials_r1.assets/chapter1-16273583378831.png" alt="第1章完了時点のイメージ図" style="zoom: 80%;" />
 
-Raspberry PiはmicroSDにOSがインストールされているため、microSDをセットする前の状態では電源を接続しても起動しません。
+Raspberry PiはmicroSDカードにOSがインストールされているため、microSDカードをセットする前の状態では電源を接続しても起動しません。
 
 
 
@@ -104,13 +104,13 @@ Raspberry PiはmicroSDにOSがインストールされているため、microSD�
 
 ---
 
-**教材に同梱されているmicroSDには既にOSをインストールしているため、本章は飛ばして「[1.3 iPhoneの設定変更](#1.3_iPhoneの設定変更)」に進んでください。**
+**教材に同梱されているmicroSDカードには既にOSをインストールしているため、本章は飛ばして「[1.3 iPhoneの設定変更](#1.3_iPhoneの設定変更)」に進んでください。**
 
-OSインストール済みの予備のmicroSDも同梱しておりますが、OSが起動しなくなったなどの問題があった場合は本章を参照して対応して下さい。
+OSインストール済みの予備のmicroSDカードも同梱しておりますが、OSが起動しなくなったなどの問題があった場合は本章を参照して対応して下さい。
 
 ---
 
-Raspberry Pi OS イメージを SD カードへインストールします。  本章では、書込みPC およびSDカード3枚を利用します。  
+Raspberry Pi OS イメージを mictroSDカードへインストールします。  本章では、書込みPC およびmicroSDカード3枚を利用します。  
 
 以下はRaspberry Pi OSをインストールした後のイメージ図です。
 
@@ -1882,7 +1882,7 @@ Ingressはデフォルトでは有効になっておらず、Ingress Controller�
 
 これでNodePort Serviceを用いてクラスタ外部にアプリケーションを公開できました。
 
-#### 4.5.5 Ingressでの公開（未）
+#### 4.5.5 Ingressでの公開
 
 最後にIngressを使うことで、より柔軟にアプリケーションを外部公開できることを確認していきます。
 今回は、パスによって接続先のアプリケーションを切り替えるIngressを作成していきます。
@@ -2074,9 +2074,8 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
 次に取得したメトリクスを可視化していきます。
 今回は [Sampler](https://github.com/sqshq/sampler) というシェルコマンドの結果を可視化できるツールを使用します。
 
-以降の手順は、Masterに接続したディスプレイにKuberntesクラスタのメトリクスを表示できるようにする。
-
-この手順は？？？？？？？？？？？
+**[4.6.2](#4.6.2 メトリクスの可視化) および [4.6.3](#4.6.3 （おまけ）ディスプレイの設定)、[4.6.4](#4.6.4 （おまけ）samplerの起動時自動実行設定)の手順は、小型ディスプレイをMasterに接続するという前提で進めていきます。**
+小型ディスプレイをWorkerに接続している場合でも、実行するノードを読み替えれば問題なく設定できます。
 
 1. (Master) Samplerのリポジトリをクローン
    
@@ -2143,40 +2142,39 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
    ```bash
    $ sampler -c /etc/sampler/k8s.yaml
    ```
-
-
-
-#### 4.6.3 （おまけ）小型ディスプレイの設定（未）
-
-小型ディスプレイを使用するために、LCDドライバを設定します。本作業は小型ディスプレイを接続するノードのみに実施します。
-
-1. Masterノードと小型ディスプレイを接続
-
-   ＜写真を追加＞
    
-   ここに小さなスイッチがあるので左側にスライドしてスイッチをONにしてください。
+7. メトリクス
 
-   正常に接続されている状態で、Raspberry Piに電源が供給されていれば、写真のように小型ディスプレイが発光します。
+#### 4.6.3 （おまけ）小型ディスプレイの設定
 
-2. ディスプレイドライバのリポジトリをクローン
+小型ディスプレイを使用するために、LCDドライバを設定します。
+
+**本作業は小型ディスプレイをMasterノードに接続している前提で進めていきます。**
+小型ディスプレイをWorkerに接続している場合でも、実行するノードを読み替えれば問題なく設定できます。
+
+1. (Master) Masterノードと小型ディスプレイを接続
+
+   補足資料「物理層の各種手順」の「小型ディスプレイの接続」を参照して、Masterノードと小型ディスプレイを接続してください。
+   
+2. (Master) ディスプレイドライバのリポジトリをクローン
 
    ```bash
    $ cd ~/
    $ git clone https://github.com/kedei/LCD_driver
    ```
 
-3. ディレクトリの権限を変更
+3. (Master) ディレクトリの権限を変更
 
    ```bash
-   #ディレクトリの権限を(drwxrwxrwx)に変更
+   # ディレクトリの権限を(drwxrwxrwx)に変更
    $ sudo chmod -R 777 ~/LCD_driver
    
-   #権限が変更されたことを確認
+   # 権限が変更されたことを確認
    $ ls -l | grep LCD_driver
    drwxrwxrwx 6 tarte tarte 4096 Aug 24 17:16 LCD_driver
    ```
 
-4. LCDドライバの設定を変更
+4. (Master) LCDドライバの設定を変更
 
    このままだと小型ディスプレイに切り替えた際に、cgroupsのmemoryサブシステムが無効になってしまうので、そうならないようにLCDドライバの設定を変更します。
 
@@ -2191,13 +2189,13 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
    dwc_otg.lpm_enable=0 console=tty1 console=ttyAMA0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait fbcon=map:10 fbcon=font:ProFont6x11 log.nologo cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
    ```
 
-5. `LCD_driver`ディレクトリに移動
+5. (Master) `LCD_driver`ディレクトリに移動
 
    ```bash
    $ cd ~/LCD_driver
    ```
 
-6. 小型ディスプレイに表示を切り替え
+6. (Master) 小型ディスプレイに表示を切り替え
 
    以下のコマンドを実行すると再起動が実行されます。
 
@@ -2236,11 +2234,11 @@ HDMI接続ディスプレイと小型ディスプレイを切り替えたい場�
      $ sudo ./LCD_hdmi
      ```
 
-#### 4.6.4（おまけ）samplerの起動時自動実行設定（未）
+#### 4.6.4（おまけ）samplerの起動時自動実行設定
 
 小型ディスプレイを接続したMasterノードが起動した際に、自動的に `sampler` を実行してメトリクスを表示できるようにしていきます。
 
-小型ディスプレイのままでは操作しにくいので、WorkerノードからSSH経由でMasterノードの設定を行っていきます。
+小型ディスプレイのままでは操作しにくいので、WorkerノードからSSH経由でMasterノードの設定を行っていきます。**今回はWorker01からSSHするという前提で進めます。**
 
 1. (Worker01) キーボードとHDMIケーブルをWorker01に接続
 
@@ -2275,31 +2273,48 @@ HDMI接続ディスプレイと小型ディスプレイを切り替えたい場�
 3. (Master) 以下のコマンドを実行し、`~/.profile`に追記
 
    ```bash
-   $ echo 'if [ $(tty) == "/dev/tty1" ]; then sampler -c /etc/sampler/k8s.yaml; fi' >> ~/.profile
+   $ cd ~/raspi-k8s-training/manifests
+   
+   # 追記内容を確認
+   $ cat ./4.6/sampler/sampler-autoexec
+   if [ $(tty) == "/dev/tty1" ]; then sampler -c /etc/sampler/k8s.yaml; fi
+   
+   # .profileに追記
+   $ cat ./4.6/sampler/sampler-autoexec >> ~/.profile
    ```
 
-   これでログイン時に自動で`sampler`を実行してくれるようになる
-   ただし、ログインは自動化されないので、以降の手順で自動ログインを有効にしていく
+   これでログイン後に自動で `sampler` を実行するようになります。
+   `sampler` を自動実行するのは `tty1` でログインしたときのみなので、SSHなどでログインした場合には、`sampler`は自動実行されません。
 
-4. (Master) `raspi-config`を実行
+   ただ、ログイン自体は自動化されないので、以降の手順でログインの自動化も行っていきます。
 
-   ```bash
-   $ sudo raspi-config
-   ```
+4. (Master) 自動ログインの有効化
 
-5. `3 Boot Options`を選択
+   Masterノード起動時の自動ログインを有効化します。このログインの自動化は `tty1` のときのみ有効なため、SSHなどでログインする場合は引き続き手動でのログインが必要になります。
 
-6. `B1 Desktop / CLI`を選択
+   1.  `raspi-config`を実行
 
-7. `B2 Console Autologin`を選択
+      ```bash
+      $ sudo raspi-config
+      ```
 
-8. `<Finish>`を選択
+   2. `1 System Options`を選択
 
-9. 再起動の確認をされるので、`<Yes>`を選択
+   3. `S5 Boot / Auto Login`を選択
 
-10. Masterに接続されているディスプレイに、samplerが表示されていることを確認
+   4. `B2 Console Autologin`を選択
 
+   5. `<Finish>`を選択
 
+   6. 再起動の確認をされるので、`<Yes>`を選択
+
+5. 再起動後に、Masterに接続されているたディスプレイにメトリクスが表示されていることを確認
+
+   SSH経由でMasterノードを操作していたので、Masterノードが再起動されるとプロンプトがWorker01に戻ってきます。
+
+   Masterノードに接続されている小型ディスプレイにメトリクスが表示されていることを確認しましょう。
+
+   ＜写真を追加＞
 
 ## おわりに
 

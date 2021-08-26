@@ -1,33 +1,36 @@
 gauges:
 - title: raspi-k8s-master CPU
   position: [[0, 0], [40, 6]]
-  rate-ms: 30000
+  rate-ms: 5000
   color: 10
   percent-only: true
   cur:
-    sample: cat /tmp/kube-node | grep raspi-k8s-master | awk '{print $3}' | tr -d "%"
+    sample: cat /tmp/kube-node | grep raspi-k8s-master | awk '{print $3}' | tr -d "%" | grep -v "unknown" || echo -1
   max:
     sample: echo 100
   min:
     sample: echo 0
 - title: raspi-k8s-worker01 CPU
   position: [[0, 6], [40, 6]]
-  rate-ms: 30000
+  rate-ms: 5000
   color: 13
   percent-only: true
   cur:
-    sample: cat /tmp/kube-node | grep raspi-k8s-worker01 | awk '{print $3}' | tr -d "%"
+    sample: cat /tmp/kube-node | grep raspi-k8s-worker01 | awk '{print $3}' | tr -d "%" | grep -v "unknown" || echo -1
   max:
     sample: echo 100
   min:
     sample: echo 0
+  triggers:
+  - title: raspi-k8s-worker02 is Down
+    condition: 
 - title: raspi-k8s-worker02 CPU
   position: [[0, 12], [40, 6]]
-  rate-ms: 30000
+  rate-ms: 5000
   color: 14
   percent-only: true
   cur:
-    sample: cat /tmp/kube-node | grep raspi-k8s-worker02 | awk '{print $3}' | tr -d "%"
+    sample: cat /tmp/kube-node | grep raspi-k8s-worker02 | awk '{print $3}' | tr -d "%" | grep -v "unknown" || echo -1
   max:
     sample: echo 100
   min:
@@ -37,27 +40,27 @@ gauges:
   rate-ms: 30000
   color: 10
   cur:
-    sample: cat /tmp/kube-node | grep raspi-k8s-master | awk '{print $4}' | tr -d "Mi"
+    sample: cat /tmp/kube-node | grep raspi-k8s-master | awk '{print $4}' | tr -d "Mi" | grep -v "unknown" || echo -1
   max:
     sample: echo 4096
   min:
     sample: echo 0
 - title: raspi-k8s-worker01 Mem
   position: [[40, 6], [40, 6]]
-  rate-ms: 30000
+  rate-ms: 5000
   color: 13
   cur:
-    sample: cat /tmp/kube-node | grep raspi-k8s-worker01 | awk '{print $4}' | tr -d "Mi"
+    sample: cat /tmp/kube-node | grep raspi-k8s-worker01 | awk '{print $4}' | tr -d "Mi" | grep -v "unknown" || echo -1
   max:
     sample: echo 4096
   min:
     sample: echo 0
 - title: raspi-k8s-worker02 Mem
   position: [[40, 12], [40, 6]]
-  rate-ms: 30000
+  rate-ms: 5000
   color: 14
   cur:
-    sample: cat /tmp/kube-node | grep raspi-k8s-worker02 | awk '{print $4}' | tr -d "Mi"
+    sample: cat /tmp/kube-node | grep raspi-k8s-worker02 | awk '{print $4}' | tr -d "Mi" | grep -v "unknown" || echo -1
   max:
     sample: echo 4096
   min:
@@ -65,7 +68,7 @@ gauges:
 textboxes:
 - title: Status
   position: [[0, 18], [80, 22]]
-  rate-ms: 30000
+  rate-ms: 5000
   sample: >-
     kubectl top node > /tmp/kube-node;
     kubectl get all --all-namespaces > /tmp/kube-all;
@@ -77,4 +80,4 @@ textboxes:
     "Replicaset:$(cat /tmp/kube-all | grep replicaset.apps/ | wc -l)";
     echo "";
     echo "NodePort Service";
-    kubectl get svc -A | grep -v ClusterIP | awk '{print $2, $6}' | column -t;
+    kubectl get svc -A --no-headers | grep -v ClusterIP | awk '{print $2, $6}' | column -t;
