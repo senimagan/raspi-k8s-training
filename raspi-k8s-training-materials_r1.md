@@ -2143,16 +2143,34 @@ Ingress Controllerの種類にもよりますが、他にもカナリアリリ�
    $ sampler -c /etc/sampler/k8s.yaml
    ```
    
-7. メトリクスが変動することを確認
+7. (Master) `resource-consumer`をデプロイ
 
    [resource-consumer](https://github.com/kubernetes/kubernetes/tree/master/test/images/resource-consumer) というCPUやメモリに負荷をかけられるコンテナアプリケーションを用いて実際にメトリクスが変動することを確認します。
 
    ```bash
-   # resource-consumerをデプロイ
-   $ kubectl run resource-consumer --image=gcr.io/k8s-staging-e2e-test-images/resource-consumer:1.10-linux-arm --port=8080
+   # resource-consumerをデプロイし、NodePortで公開
+   $ cd ~/raspi-k8s-training/manifests
+   $ kubectl apply -f ./4.6/resource-consumer/resource-consumer.yaml
+   pod/resource-consumer created
+   service/resource-consumer created
    
-   # resource-consumerをNodePortで公開
-   $ kubectl expose pod r
+   # resoruce-consumerがどのNodeにあるか確認
+   $ kubectl get pod resource-consumer -owide | awk '{print $7}'
+   NODE
+   raspi-k8s-worker02
+   ```
+
+8. (Master) `resource-consumer` でリソースを消費させる
+
+   `resource-consumer` に以下を命令します。
+
+   - メモリを 2000MB 
+
+   ```bash
+   # resource-consumerのNodePortを取得
+   $ RC_PORT=`kubectl get svc resource-consumer -ojsonpath='{.spec.ports[0].nodePort}'
+   
+   
    ```
 
    
