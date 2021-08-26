@@ -1,0 +1,1 @@
+if [ $(tty) == "/dev/tty1" ]; then sampler -c /etc/sampler/k8s.yaml; fi

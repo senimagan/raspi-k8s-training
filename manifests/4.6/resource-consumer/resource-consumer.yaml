@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: resource-consumer
+  name: resource-consumer
+spec:
+  containers:
+  - image: gcr.io/k8s-staging-e2e-test-images/resource-consumer:1.10-linux-arm
+    name: resource-consumer
+    ports:
+    - containerPort: 8080
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: resource-consumer
+  name: resource-consumer
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    run: resource-consumer
+  type: NodePort

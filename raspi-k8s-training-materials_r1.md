@@ -6,8 +6,6 @@
 
 
 
-<div style="page-break-before:always"></div>
-
 ## はじめに
 
 （仮文言）
@@ -50,29 +48,33 @@ section 4.教材返却
 
 使用した機材は、ハンズオン研修終了後 翌2日以内に同梱されている着払い伝票（ゆうパック）にて返却してください。
 
-
-
 ## 1. 事前準備
 
 Kubernetesを構築する前に、必要機材の確認やハードウェアなどの準備を行います。
 
 ### 1.1 必要機材の確認
 
-受け取った教材に、以下の機材が同梱されていることを確認してください。
-教材に不備・不足などあった場合は速やかに事務局(managed-paas@sdb.jp.nec.com)までご連絡ください。
+受け取った教材一式を開封してください。段ボールや緩衝材は返送時に使用するので保管しておいてください。
 
-| 機材名                                | 個数 | 説明                                                         |
-| ------------------------------------- | ---- | ------------------------------------------------------------ |
-| Raspberry Pi 4 Model B (4GB RAM)      | 3    | サーバとして使用                                             |
-| microSDカード                         | 4    | Raspberry Piのストレージとして使用。<br />OSインストール済み。1枚は予備。 |
-| ACアダプタ                            | 3    | Raspberry Piの電源供給に使用                                 |
-| 充電用USB Type-Cケーブル （3個入）    | 1    | Raspberry Piの電源供給に使用                                 |
-| 電源タップ                            | 1    | Raspberry Piの電源供給に使用                                 |
-| Stackable Acrylic Case                | 1    | Raspberry Pi用の積層ケース                                   |
-| HDMI - microHDMI変換アダプタ          | 1    | Raspberry Piの映像出力をHDMIに変換するために使用             |
-| OSOYOO 3.5" Raspberry Pi Touch Screen | 1    | Raspberry Pi用の小型ディスプレイ                             |
+<img src="raspi-k8s-training-materials_r1.assets/image-20210826091852098.png" alt="image-20210826091852098" style="zoom:67%;" />
 
+開封した教材一式の中に以下の必要機材が揃っていることを確認してください。
 
+<img src="raspi-k8s-training-materials_r1.assets/image-20210826093555488.png" alt="image-20210826093555488" style="zoom:70%;" />
+
+| No.  | 機材名                                | 個数 | 説明                                                         |
+| :--: | ------------------------------------- | :--: | ------------------------------------------------------------ |
+|  1   | ACアダプタ                            |  3   | Raspberry Piの電源供給に使用                                 |
+|  2   | HDMI - microHDMI変換アダプタ          |  1   | Raspberry Piの映像出力をHDMIに変換するために使用             |
+|  3   | 充電用USB Type-Cケーブル （3個入）    |  1   | Raspberry Piの電源供給に使用                                 |
+|  4   | microSDカード                         |  4   | Raspberry Piのストレージとして使用。<br />OSインストール済み。1枚は予備。 |
+|  5   | Raspberry Pi 4 Model B (4GB RAM)      |  3   | Kubernetesのノード（サーバ）として使用                       |
+|  6   | OSOYOO 3.5" Raspberry Pi Touch Screen |  1   | Raspberry Pi用の小型ディスプレイ                             |
+|  7   | Stackable Acrylic Case                |  1   | Raspberry Pi用の積層ケース                                   |
+|  8   | 電源タップ                            |  1   | Raspberry Piの電源供給に使用                                 |
+|  9   | 返送用着払い伝票（ゆうパック）        |  1   | 研修完了後の教材の返送に使用                                 |
+
+教材一式に不備・不足などあった場合は速やかに事務局(managed-paas@sdb.jp.nec.com)までご連絡ください。
 
 また、以下の機材については受講者各自でご用意ください。
 
@@ -84,23 +86,17 @@ Kubernetesを構築する前に、必要機材の確認やハードウェアな�
 | 社有iPhone                 | 1    | Raspberry Pi同士の接続およびインターネットアクセスに使用 |
 | シンクラ端末(SS10など)     | 1    | 本資料の参照やトラブルシュート時の調査・情報収集に使用   |
 
-<div style="page-break-before:always"></div>
+### 1.2 Raspberry Piラックの組み立て
 
-### 1.2 Raspberry Piのラック組み立て
+補足資料「物理層の各種手順」の「Raspberry Piラックの組み立て手順」を参照してラックを組み立てて下さい。
 
-Raspberry Piと積層ケースを開封しラックを組み立てます。
-
-多少機材が異なりますが、以下サイトを参考に組み立ててください。
-https://developers.cyberagent.co.jp/blog/archives/14721/
-
-下から1段目は空にして、2~4段目にRaspberry Piを配置すると取り回しやすくなります。
 **この時点では小型ディスプレイは接続しないでください。**
 
-以下はmicroSDをセットする前のRaspberry Piのイメージ図です。
+以下はmicroSDカードをセットする前のRaspberry Piのイメージ図です。
 
 <img src="raspi-k8s-training-materials_r1.assets/chapter1-16273583378831.png" alt="第1章完了時点のイメージ図" style="zoom: 80%;" />
 
-Raspberry PiはmicroSDにOSがインストールされているため、microSDをセットする前の状態では電源を接続しても起動しません。
+Raspberry PiはmicroSDカードにOSがインストールされているため、microSDカードをセットする前の状態では電源を接続しても起動しません。
 
 
 
@@ -108,21 +104,19 @@ Raspberry PiはmicroSDにOSがインストールされているため、microSD�
 
 ---
 
-**教材に同梱されているmicroSDには既にOSをインストールしているため、本章は飛ばして「[1.3 iPhoneの設定変更](#1.3_iPhoneの設定変更)」に進んでください。**
+**教材に同梱されているmicroSDカードには既にOSをインストールしているため、本章は飛ばして「[1.3 iPhoneの設定変更](#1.3_iPhoneの設定変更)」に進んでください。**
 
-OSインストール済みの予備のmicroSDも同梱しておりますが、OSが起動しなくなったなどの問題があった場合は本章を参照して対応して下さい。
+OSインストール済みの予備のmicroSDカードも同梱しておりますが、OSが起動しなくなったなどの問題があった場合は本章を参照して対応して下さい。
 
 ---
 
-Raspberry Pi OS イメージを SD カードへインストールします。  本章では、書込みPC およびSDカード3枚を利用します。  
+Raspberry Pi OS イメージを mictroSDカードへインストールします。  本章では、書込みPC およびmicroSDカード3枚を利用します。  
 
 以下はRaspberry Pi OSをインストールした後のイメージ図です。
 
 <img src="raspi-k8s-training-materials_r1.assets/chapter2.png" alt="第2章完了時点のイメージ図" style="zoom:80%;" />
 
 この手順を完了することで、Raspberry Piをコンピュータとして起動できるようになります。
-
-<div style="page-break-before:always"></div>
 
 #### 前提条件
 
@@ -186,8 +180,6 @@ Raspberry Pi OS イメージを SD カードへインストールします。  �
 10. 書込PCからmicroSDを取り出す
 
 以上の作業を3回繰り返して、OSをインストールしたmicroSDを3つ用意します。
-
-<div style="page-break-before:always"></div>
 
 ### 1.3 iPhoneの設定変更
 
@@ -620,8 +612,6 @@ $ sudo apt upgrade -y
 ※※  **2.1 から 2.10** までの作業は3台分(Master:1台、Worker:2台) 実施ください  ※※ 
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
 
-<div style="page-break-before:always"></div>
-
 ## 3. Kubernetesクラスタの構築／初期設定
 
 ここからKubernetesクラスタの構築と初期設定を行います。
@@ -631,7 +621,7 @@ $ sudo apt upgrade -y
 
 第3章の手順が完了した時点で、Kubernetesとして機能する基本的なクラスタが完成します。
 
-**3.1 - 3.2の作業はすべてのノードで実施してください。**
+**3.1 - 3.3の作業はすべてのノードで実施してください。**
 
 また、OSの設定が完了したことで各ノード同士はSSHでアクセスできるようになっています。
 ディスプレイやキーボードの抜き差しが面倒であれば、以降はSSHで各ノードを切り替えて作業を実施しても構いません。
@@ -795,8 +785,6 @@ Kubernetesの構築・運用に必要なパッケージをインストールし�
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
 ※※　**3.3** までの作業は3台分(Master:1台、Worker:2台)実施ください　※※
 ※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※※
-
-<div style="page-break-before:always"></div>
 
 ### 3.4 Kubernetesクラスタの構築
 
@@ -1034,8 +1022,6 @@ Kubernetesクラスタを構築していきます。
 
 以上でKubernetesクラスタの構築は完了です。
 
-<div style="page-break-before:always"></div>
-
 ## 4. Kubernetesクラスタを運用しよう
 
 ここからは、構築したKuebernetesクラスタを用いて、Kubernetesの初歩的な運用や動きについて体験しましょう。
@@ -1074,7 +1060,19 @@ Kubernetesクラスタを構築していきます。
 
    ```bash
    $ ls -l raspi-k8s-training
+   total 720
+   drwxr-xt-x 10 tarte tarte   4096 Aug 23 18:19 manifests
+   drwxr-xt-x  2 tarte tarte   4096 Aug 23 18:19 raspi-k8s-training-materials_r1.assets
+   -rw-r--t--  1 tarte tarte 646511 Aug 23 18:19 raspi-k8s-training-materials_r1.html
+   -rwxr-xt-x  1 tarte tarte  78644 Aug 23 18:19 raspi-k8s-training-materials_r1.md
    
+   $ ls -l raspi-k8s-trining/manifests/
+   total 36
+   drwxr-xt-x 10 tarte tarte 4096 Aug 23 18:19 4.2
+   drwxr-xt-x 10 tarte tarte 4096 Aug 23 18:19 4.4
+   drwxr-xt-x 10 tarte tarte 4096 Aug 23 18:19 4.5
+   drwxr-xt-x 10 tarte tarte 4096 Aug 23 18:19 4.6
+   -rw-r--t--  1 tarte tarte 1160 Aug 23 18:19 readme.txt
    ```
 
 
@@ -1459,21 +1457,82 @@ Kubernetesの大きな特徴の一つに「自己修復(Self-healing)」とい�
 
 Podがいくつかのノードに偏ってしまうと、負荷がかかってパフォーマンスが下がったり、単一障害点(SPOF)になったりする可能性があります。そのような状態を避けるために、Podを常にバランスよく分散させる [kube-descheduler](https://github.com/kubernetes-sigs/descheduler/tree/master) という機能も開発されています。
 
+### 4.5 アプリケーションの公開
 
+これまでの作業でアプリケーションはデプロイできましたが、現在の状態ではクラスタ外部からアプリケーションにアクセスすることができません。
 
-### 4.5 アプリケーションの公開（未）
+この章では、クラスタ外部からアプリケーションにアクセスできるようにしていきます。
 
-これまでの作業でアプリケーションはデプロイできましたが、現在の状態ではクラスタ外部からアプリケーションに
+#### 4.5.1 Serviceの概要とアプリケーションの外部公開
 
-#### 4.5.1 アプリケーションの外部公開方法（未）
+実際にアプリケーションを公開する前に、アプリケーションの公開に必要なKubernetesのリソース（Service やIngress）について簡単に説明します。
+（厳密な定義や仕組みとは異なるのであくまでイメージとして捉えてください）
 
-（作成中）
+ServiceとはPodへの接続を解決してくれるリソースです。
+Serviceにアクセスするとそれに紐づいたPodにトラフィックが振り分けられます。
+
+ServiceにはClusterIP,  NodePort, LoadBalancer, ExternalNameという4種類のタイプが存在します。
+このうち、NodePort と LoadBalancer は外部公開に使用されます。
+また、Serviceとは別に外部公開やアクセス制御を行うための Ingress というリソースが存在します。
+
+ここでは、よく使用される ClusterIP Service, NodePort Service, LoadBalancer Service, Ingressについて簡単に説明します。
+
+##### ClusterIP Service
+
+ClusterIP Service はKubernetes内での通信で利用されます。ClusterIP Service を作成すると、クラスタ内で利用可能なIPアドレスが払い出されます。そのIPアドレスにアクセスすると、Serviceに紐づくPodにトラフィックが振り分けられます。
+「[4.5.3 ClusterIP Serviceでの公開](#4.5.3 ClusterIP Serviceでの公開)」にて、その動作を確認します。
+
+<img src="raspi-k8s-training-materials_r1.assets/image-20210823161416316.png" alt="image-20210823161416316" style="zoom:80%;" />
+
+##### NodePort Service
+
+NodePort Service はクラスタに参加しているNodeのランダムなポート(デフォルトだと30000~32767)を使用して、クラスタ外部にアプリケーションを公開します。NodePort Service は ClusterIP Service を拡張して実装されています。
+「[4.5.4 NodePort Serviceでの公開](#4.5.4 NodePort Serviceでの公開)」にて、その動作を確認します。
+
+<img src="raspi-k8s-training-materials_r1.assets/image-20210823163029812.png" alt="image-20210823163029812" style="zoom:80%;" />
+
+この方法で公開した場合、アプリケーションにアクセスするには、`いずれかのNodeのIPアドレス`と`NodePortで使用しているポート` を指定する必要があります。
+そのため、アクセスしていたNodeが削除されたり、異常終了していたりするとアクセス不能になるというデメリットがあります。その場合は、他の有効なNodeのIPアドレスを指定すればアクセス可能ですが、常にそれを把握してアクセス先を変更するのは面倒です。
+そのデメリットを解消したのが、次に紹介する LoadBalancer Service です。
+
+##### LoadBalancer Service
+
+LoadBalancer Serviceは、内部でNodePortを作成したうえで、クラスタ外部もしくは内部にLoadBalancerを作成し、LoadBalancerのロードバランス先（バックエンド）として疎通可能なNodeとNodePortに転送します。
+
+本研修では使用しません。
+
+<img src="raspi-k8s-training-materials_r1.assets/image-20210823165723579.png" alt="image-20210823165723579" style="zoom:80%;" />
+
+パブリッククラウド上に構築したKubernetesの場合は、LoadBalancer Serviceを作成すると、そのパブリッククラウドで提供されているLoadBalancerがクラスタ外部に作成されます。
+例えば、AWSだとNetworkLoadBalancer もしくは ClassicLoadBalancerが作成されます。
+
+一方で、本研修のようなベアメタルな環境では、デフォルトだとLoadBalancer Serviceを使用することができません。
+これはベアメタルな環境では、クラスタ外部にLoadBalancerを動的に作成したり設定したりすることが難しいためです。ただし、[MetalLB](https://metallb.universe.tf/) というアプリケーションをデプロイすれば、ベアメタルな環境でもLoadBalancer Serviceを使用できるようになります。
+
+##### Ingress
+
+ここまでで紹介したNodePort ServiceやLoadBalancer Serviceでもアプリケーションの外部公開は可能ですが、Ingressを用いることでSSL/TLS終端の設定やパスによるルーティング、カナリアリリースなど、より柔軟な設定が可能となります。
+
+Ingressはデフォルトでは有効になっておらず、Ingress Controllerというアプリケーションをデプロイすることで利用可能になります。様々なベンダがIngress Controllerを開発しており、どのIngress Controllerを使用するかは用途や性能で自由に選択することができます。
+良く使用されるIngress Controllerとして、[NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) があります。
+
+「[4.5.5 Ingressでの公開](#4.5.5 Ingressでの公開)」にて、その動作を確認します。
 
 #### 4.5.2 公開するアプリケーションの準備
 
-今回はApacheとnginxという2種類のWebサーバをデプロイしていきます。
+アプリケーションを公開する前に、公開するアプリケーションを用意しましょう。
+今回はApacheとNGINXという2種類のWebサーバをデプロイしていきます。
 
-1. Apache(httpd)をデプロイ
+1. 検証用のNamespaceを作成
+
+   ```bash
+   $ kubectl create namespace publish-app
+   ```
+   
+2. Apache(httpd)をデプロイ
+
+   この手順ではApacheのDeploymentとConfigMapをデプロイします。
+   ConfigMapには `index.html` が定義されており、それをDeploymentがApacheのドキュメントルート配下の`httpd`ディレクトリにマウントしている。
 
    ```bash
    # Apacheのマニフェストを確認
@@ -1481,22 +1540,10 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    $ cat ./4.5/apache.yaml
    ---
    apiVersion: v1
-   kind: Service
-   metadata:
-     name: httpd
-   spec:
-     ports:
-     - port: 80
-       protocol: TCP
-       targetPort: 80
-     selector:
-       app: httpd
-     type: ClusterIP
-   ---
-   apiVersion: v1
    kind: ConfigMap
    metadata:
      name: httpd-html
+     namespace: publish-app
    data:
      index.html: |
        Welcome to Apache(httpd)!
@@ -1505,6 +1552,7 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    kind: Deployment
    metadata:
      name: httpd
+     namespace: publish-app
    spec:
      replicas: 1
      selector:
@@ -1531,32 +1579,25 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
 
    ```bash
    $ kubectl apply -f ./4.5/apache.yaml
+   configmap/httpd-html created
+   deployment.apps/httpd created
    ```
 
-2. nginxをデプロイ
+3. NGINXをデプロイ
+
+   この手順ではNGINXのDeploymentとConfigMapをデプロイします。
+   ConfigMapには `index.html` が定義されており、それをDeploymentがNGINXのドキュメントルート配下の`nginx`ディレクトリにマウントしている。
 
    ```bash
-   # nginxのマニフェストを確認
+   # NGINXのマニフェストを確認
    $ cd ~/raspi-k8s-training/manifests/
    $ cat ./4.5/nginx.yaml
-   ---
-   apiVersion: v1
-   kind: Service
-   metadata:
-     name: nginx
-   spec:
-     ports:
-     - port: 80
-       protocol: TCP
-       targetPort: 80
-     selector:
-       app: nginx
-     type: ClusterIP
    ---
    apiVersion: v1
    kind: ConfigMap
    metadata:
      name: nginx-html
+     namespace: publish-app
    data:
      index.html: |
        Welcome to nginx!!
@@ -1565,6 +1606,7 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
    kind: Deployment
    metadata:
      name: nginx
+     namespace: publish-app
    spec:
      replicas: 1
      selector:
@@ -1591,39 +1633,263 @@ Podがいくつかのノードに偏ってしまうと、負荷がかかって�
 
    ```bash
    $ kubectl apply -f ./4.5/nginx.yaml
+   configmap/nginx-html created
+   deployment.apps/nginx created
    ```
 
-3. ApacheとnginxのPodがReadyになるまで待機
+4. ApacheとnginxのPodがReadyになるまで待機
 
    ```bash
    # ApacheとnginxのPodがReadyになるまで待機
-   $ kubectl wait pod --all --for=condition=Ready --timeout=5m
+   $ kubectl wait pod -n publish-app --all --for=condition=Ready --timeout=5m
    pod/httpd-55583ft421-2q5ks condition met
    pod/nginx-54fdf853c7-wf83h condition met
    
    # ApacheとnginxのPodがReadyになっていることを確認
-   $ kubectl get pod -n default
+   $ kubectl get pod -n publish-app
    NAME                     READY   STATUS    RESTARTS   AGE
    httpd-55583ft421-2q5ks   1/1     Running   0          4m15s
    nginx-54fdf853c7-wf83h   1/1     Running   1          4m35s
    ```
 
+公開するアプリケーションの準備はこれで完了。
 
-#### 4.5.3 ClusterIP Serviceでの公開（未）
+#### 4.5.3 ClusterIP Serviceでの公開
 
-（作成中）
+現在の状態ではクラスタ内部で通信する場合でもPodのIPアドレスを指定する必要があります。
+ただ、PodのIPアドレスは作成されるたびにランダムに決まるため、このままだと不便です。
 
-#### 4.5.4 NodePort Serviceでの公開（未）
+そこで、ClusterIP Serviceを作成することで、クラスタ内部で名前解決できること、さらにPodのIPアドレスが変わってもServiceの設定を変更することなくアクセスできることを確認していきます。
 
-（作成中）
+1. ApacheのClusterIP Serviceをデプロイ
+
+   ```bash
+   # ApacheのClusterIP Serviceのマニフェストを確認
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/apache-clusterip.yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: httpd-clusterip
+     namespace: publish-app
+   spec:
+     ports:
+     - port: 80
+       protocol: TCP
+       targetPort: 80
+     selector:
+       app: httpd
+     type: ClusterIP
+   ```
+
+   ```bash
+   $ kubectl apply -f ./4.5/apache-clusterip.yaml
+   service/httpd-clusterip created
+   ```
+
+2. NGINXのClusterIP Serviceをデプロイ
+
+   ```bash
+   # NGINXのClusterIP Serviceのマニフェストを確認
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/nginx-clusterip.yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: nginx-clusterip
+     namespace: publish-app
+   spec:
+     ports:
+     - port: 80
+       protocol: TCP
+       targetPort: 80
+     selector:
+       app: nginx
+     type: ClusterIP
+   ```
+
+   ```bash
+   $ kubectl apply -f ./4.5/nginx-clusterip.yaml
+   service/nginx-clusterip created
+   ```
+
+3. Serviceの一覧を確認
+
+   ```bash
+   $ kubectl get service -n publish-app
+   NAME              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+   httpd-clusterip   ClusterIP   10.111.224.54    <none>        80/TCP    3m8s
+   nginx-clusterip   ClusterIP   10.103.173.148   <none>        80/TCP    2m
+   ```
+
+4. クラスタ内部でClusterIP Serviceを介してApache Podにアクセスできることを確認
+
+   NGINX PodからApacheのClusterIP Serviceに対してアクセスしてみます。
+
+   ```bash
+   # NGINX PodからApacheのClusterIP Serviceに対してwgetを実行
+   $ kubectl exec -n publish-app deploy/nginx -- http://httpd-clusterip/
+   <html><body><h1>It works!</h1></body></html>
+   
+   # ClusterIP　ServiceのIPアドレスを指定しても同じ動作になる
+   $ APACHE_CLUSTERIP=`kubectl get svc -n publish-app httpd-clusterip -ojsonpath='{.spec.clusterIP}'`
+   $ kubectl exec -n publish-app deploy/nginx -- http://${APACHE_CLUSTERIP}/
+   <html><body><h1>It works!</h1></body></html>
+   
+   # httpdパスを指定するとマウントしたファイルが出力される
+   $ kubectl exec -n publish-app deploy/nginx -- http://httpd-clusterip/httpd/
+   Welcome to Apache(httpd)!
+   ```
+
+   このようにApacheのClusterIP Serviceで名前解決することで、ApacheのPodにアクセスできていることが分かります。
+
+5. クラスタ内部でClusterIP Serviceを介してNGINX Podにアクセスできることを確認
+
+   今度は逆にApache PodからNGINXのClusterIP Serviceに対してアクセスしてみます。
+
+   ```bash
+   # Apache PodからNGINXのClusterIP Serviceに対してwgetを実行
+   # ちょっと長くなるのでタイトルだけ抽出
+   $ kubectl exec -n publish-app deploy/httpd -- http://nginx-clusterip/ | grep title
+   <title>Welcome to nginx!</title>
+   
+   # ClusterIP　ServiceのIPアドレスを指定しても同じ動作になる
+   $ NGINX_CLUSTERIP=`kubectl get svc -n publish-app nginx-clusterip -ojsonpath='{.spec.clusterIP}'`
+   $ kubectl exec -n publish-app deploy/nginx -- http://${NGINX_CLUSTERIP}/ | grep title
+   <title>Welcome to nginx!</title>
+   
+   # nginxパスを指定するとマウントしたファイルが出力される
+   $ kubectl exec -n publish-app deploy/nginx -- http://httpd-clusterip/nginx/
+   Welcome to nginx!!
+   ```
+
+6. PodのIPアドレスが変わってもServiceを介してアクセスできることを確認
+
+   今回はApache Podを削除してIPアドレスを変更したうえで、NGINX PodからApacheのClusterIP Serviceを介してアクセスしてみます。
+
+   ```bash
+   # 現在のApache PodのIPアドレスを確認
+   $ kubectl get pod -n publish-app httpd -owide -l app=httpd
+   NAME                     READY   STATUS    RESTARTS   AGE   IP             NODE                 NOMINATED NODE   READINESS GATES
+   httpd-55584fd454-nj791   1/1     Running   0          10m   10.244.2.293   raspi-k8s-worker02   <none>           <none>
+   
+   # Apache Podを削除
+   $ kubectl delete pod -n publish-app -l app=httpd
+   pod "httpd-55584fd454-nj791" deleted
+   
+   # Apache Podが再作成され、IPアドレスが変わっていることを確認
+   $ kubectl get pod -n publish-app httpd -owide -l app=httpd
+   NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                 NOMINATED NODE   READINESS GATES
+   httpd-55584fd454-hx9bs   1/1     Running   0          2m13s   10.244.2.94   raspi-k8s-worker02   <none>           <none>
+   
+   # NGINX PodからApacheのClusterIP Serviceに対してwgetを実行
+   $ kubectl exec -n publish-app deploy/nginx -- http://httpd-clusterip/
+   <html><body><h1>It works!</h1></body></html>
+   ```
+
+このようにPodが追加・削除されてもClusterIP Serviceが稼働中のPodに転送してくれるため、PodのIPアドレスに依存することなくアクセスすることができます。
+
+#### 4.5.4 NodePort Serviceでの公開
+
+次にクラスタ外部からアプリケーションにアクセスできるようNodePort Serviceを作成し、その動作を確認します。
+
+1. ApacheのNodePort Serviceをデプロイ
+
+   ```bash
+   # ApacheのNodePort Serviceのマニフェストを確認
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/apache-nodeport.yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: httpd-nodeport
+     namespace: publish-app
+   spec:
+     ports:
+     - port: 80
+       protocol: TCP
+       targetPort: 80
+     selector:
+       app: httpd
+     type: NodePort
+   ```
+
+   ```bash
+   $ kubectl apply -f ./4.5/apache-nodeport.yaml
+   service/httpd-nodeport created
+   ```
+
+2. NGINXのNodePort Serviceをデプロイ
+
+   ```bash
+   # NGINXのNodePort Serviceのマニフェストを確認
+   $ cd ~/raspi-k8s-training/manifests/
+   $ cat ./4.5/nginx-nodeport.yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: nginx-nodeport
+     namespace: publish-app
+   spec:
+     ports:
+     - port: 80
+       protocol: TCP
+       targetPort: 80
+     selector:
+       app: nginx
+     type: NodePort
+   ```
+
+   ```bash
+   $ kubectl apply -f ./4.5/nginx-nodeport.yaml
+   service/nginx-nodeport created
+   ```
+
+3. NodePort Serviceの一覧を確認
+
+   ClusterIP Serviceと異なり、PORT(S)列にNodePortが表示されていることが分かる。
+
+   下記の結果の場合だと、Apacheにアクセスするには `http://<NodeのIPアドレス>:30357` 、NGINXにアクセスするには `http://<NodeのIPアドレス>:32579` を指定すればよい。
+
+   ```bash
+   $ kubectl get service -n publish-app | grep -E "NAME|NodePort"
+   NAME             TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+   httpd-nodeport   NodePort   10.104.98.89    <none>        80:30357/TCP   2m1s
+   nginx-nodeport   NodePort   10.103.244.92   <none>        80:32579/TCP   112s
+   ```
+
+4. クラスタ外部からApacheにアクセスできることを確認
+
+   今回はクラスタ外部からアクセスするクライアントとして、iPhoneのブラウザ（SafariでもEdgeでも可）を使用します。
+
+   iPhoneのブラウザでApache(`http://172.20.10.2:30357`)にアクセス。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210823201610949.png" alt="image-20210823201610949" style="zoom:80%;" />
+
+   ちなみに指定するNodeのIPアドレスを変更しても同じページにアクセスできます。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210823201629316.png" alt="image-20210823201629316" style="zoom:80%;" />
+
+5. クラスタ外部からNGINXにアクセスできることを確認
+
+   iPhoneのブラウザでNGINX(`http://172.20.10.2:32579`)にアクセス。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210823202035965.png" alt="image-20210823202035965" style="zoom:80%;" />
+
+   同様に指定するNodeのIPアドレスを変更しても同じページにアクセスできます。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210823202125293.png" alt="image-20210823202125293" style="zoom:80%;" />
+
+これでNodePort Serviceを用いてクラスタ外部にアプリケーションを公開できました。
 
 #### 4.5.5 Ingressでの公開
 
-Ingressを有効化することで、クラスタ外部からのアクセスやトラフィック制御、ロードバランスなどが可能になります。
+最後にIngressを使うことで、より柔軟にアプリケーションを外部公開できることを確認していきます。
+今回は、パスによって接続先のアプリケーションを切り替えるIngressを作成していきます。
 
-以降の作業はMasterノードで実施してください。
+1. NGINX Ingress Controllerをデプロイ
 
-1. Nginx Ingress Controllerをデプロイ
+   Ingressを使用できるようにするために、NGINX Ingress Controllerをデプロイします。
 
    ```bash
    $ kubectl apply -f \
@@ -1644,45 +1910,55 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
    ingress-nginx-admission-patch-ph5th          0/1     Completed   1          2m15s
    ingress-nginx-controller-55bc4f5565-p2mh4   1/1     Running     0          2m15s
    ```
-   
+
    `ingress-nginx-admission-create-xxxxx` Podや`ingress-nginx-admission-patch-xxxxx` PodがCrashLoopBackOffとなる場合は、すべてのノードを再起動した上で以下のコマンドを実行します。
-   
+
    ```bash
    $ kubectl replace --force -f \
    https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/baremetal/deploy.yaml
    ```
-   
+
    上記コマンドを実行したら、再度PodがReadyになるまで待機する。
-   
-3. Ingressを作成
+
+3. パスでルーティングするようなIngressを作成
 
    ```bash
    # Ingressのマニフェストを確認
    $ cd ~/raspi-k8s-training/manifests/
-   $ cat ./4.5/ingress-test.yaml
-   apiVersion: extensions/v1beta1
+   $ cat ./4.5/ingress-path.yaml
+   apiVersion: networking.k8s.io/v1
    kind: Ingress
    metadata:
-     name: ingress-test
+     name: ingress-path
+     namespace: publish-app
    spec:
      rules:
      - http:
          paths:
          - path: /nginx
+           pathType: Prefix
            backend:
-             serviceName: nginx
-             servicePort: 80
+             service: 
+               name: nginx-clusterip
+               port:
+                 number: 80
          - path: /httpd
+           pathType: Prefix
            backend:
-             serviceName: httpd
-             servicePort: 80
+             service:
+               name: httpd-clusterip
+               port:
+                 number: 80
    ```
 
    ```bash
-   $ kubectl apply -f ./4.5/ingress-test.yaml
+   $ kubectl apply -f ./4.5/ingress-path.yaml
+   ingress.networking.k8s.io/ingress-path created
    ```
 
 4. Nginx Ingress ControllerのNodePort Serviceを確認
+
+   今回はNGINX Ingress Controllerをベアメタル環境で構築しているため、アプリケーションはNGINX Ingress ControllerのNodePort Serviceを介して公開されます。
 
    ```bash
    # Nginx Ingress ControllerのNodePort Serviceを確認
@@ -1711,99 +1987,154 @@ Ingressを有効化することで、クラスタ外部からのアクセスや�
    Welcome to Apache(httpd)!
    ```
 
-   それぞれApacheとNginxからレスポンスが返ってきており、複数のアプリを1つのNodePort Serviceで公開できていることがわかります。。
+   もちろん、iPhoneからでもアクセスできます。
 
-   以下は今回作成したIngressのイメージ図です。
+   それぞれApacheとNginxからレスポンスが返ってきており、複数のアプリを1つのNodePort Serviceで公開できていることがわかります。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210824112708545.png" alt="image-20210824112708545" style="zoom:75%;" />
+
+今回作成したパスによるルーティングを行うIngressのイメージ図は以下のようになります。
 
    <img src="raspi-k8s-training-materials_r1.assets/ingress-image.png" alt="Ingressのイメージ図" style="zoom:70%;" />
 
-   まず、30431番ポートへのリクエストをNginx ingress controllerが受け取り、そのリクエストのパスとIngressに設定したルールに従って、リクエストをPodに振り分けることでL7 LoadBalancingを実現しています。
+まず、30431番ポートへのリクエストをNginx ingress controllerが受け取り、そのリクエストのパスとIngressに設定したルールに従って、リクエストをPodに振り分けることでL7 LoadBalancingを実現しています。
 
+Ingress Controllerの種類にもよりますが、他にもカナリアリリースやSSL/TLS終端の設定、タイムアウトの設定など様々な設定が可能です。
 
+### 4.6 メトリクスの監視
 
-### 4.6 メトリクスの監視（未）
+実際にKubernetesを運用していくには、クラスタのCPU/メモリの使用量がどれくらいか、異常が発生しているPodがないかなど、様々なメトリクスを監視していく必要があります。
+本番環境などでは、[Prometheus](https://prometheus.io/) + [Grafana](https://grafana.com/)などのOSSを組み合わせたり、DataDogのような要監視サービスを使ったりして監視することが多いです。
 
-#### 4.6.1 metrics-serverの追加（未）
+本研修の環境では[Prometheus](https://prometheus.io/) + [Grafana](https://grafana.com/)を動かすにはマシンリソースが足りないので、他のOSSを組み合わせて最低限のメトリクス（NodeのCPU/メモリ使用率、各種リソースの数など）を監視できるようにしていきましょう。
+
+#### 4.6.1 metrics-serverの追加
 
 デフォルトの状態ではKubernetesクラスタのメトリクスを取得することができないため、**metrics-server**をデプロイします。
 **metrics-server**をデプロイすることで、`kubectl top`コマンドを用いてKubernetesクラスタのメトリクスを収集できるようになります。
 
-1. (Master) `kubectl top`が動作しないことを確認
+1. `kubectl top`が動作しないことを確認
 
    ```bash
-   $ kubectl top node
-   Erro from server (NotFound): the server could not find the requested resource (get services http:heapster:)
+   $ kubectl top node --use-protocol-buffers
+   error: Metrics API not available
    ```
 
-2. (Master) metrics-serverをデプロイ
+2. metrics-serverをデプロイ
 
    ```bash
    $ cd ~/raspi-k8s-training/manifests/
-   $ kubectl apply -f ./4.6/metrics-server/manifests/base/
+   $ kubectl apply -f ./4.6/metrics-server/components.yaml
+   serviceaccount/metrics-server created
+   clusterrole.rbac.authorization.k8s.io/system:aggregated-metrics-reader created
+   clusterrole.rbac.authorization.k8s.io/system:metrics-server created
+   rolebinding.rbac.authorization.k8s.io/metrics-server-auth-reader created
+   clusterrolebinding.rbac.authorization.k8s.io/metrics-server:system:auth-delegator created
+   clusterrolebinding.rbac.authorization.k8s.io/system:metrics-server created
+   service/metrics-server created
+   deployment.apps/metrics-server created
+   apiservice.apiregistration.k8s.io/v1beta1.metrics.k8s.io created
    ```
 
-5. (Master) metrics-serverが正常にデプロイされたことを確認
+3. metrics-serverのPodがReadyになるまで待機
 
    ```bash
-   $ kubectl get pod -n kube-system | grep metrics-server
-   metrics-server-xxxxxxxxxx-yyyyy   1/1     Running   0          1m
+   # metrics-serverのPodがReadyになるまで待機
+   $ kubectl wait pod -n kube-system -l k8s-app=metrics-server --for=condition=Ready --timeout=5m
+   pod/metrics-server-5cd859f5c-t77s5 condition met
+   
+   # metrics-serverのPodがReadyになっていることを確認
+   $ kubectl get pod -n kube-system -l k8s-app=metrics-server
+   NAME                             READY   STATUS    RESTARTS   AGE
+   metrics-server-5cd859f5c-t77s5   1/1     Running   0          3m2s
    ```
 
-6. (Master) `kubectl top`が機能することを確認
+6. `kubectl top`が機能することを確認
 
    ```bash
-   $ kubectl top node
+   $ kubectl top node --use-protocol-buffers
    NAME                 CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
-   raspi-k8s-master     388m         9%     570Mi           14%
-   raspi-k8s-worker01   179m         4%     320Mi           8%
-   raspi-k8s-worker02   193m         4%     303Mi           7%
+   raspi-k8s-master     556m         13%    735Mi           19%
+   raspi-k8s-worker01   234m         5%     380Mi           10%
+   raspi-k8s-worker02   232m         5%     278Mi           7%
    ```
 
-   以下が出力される場合は、しばらくしてから再度実行してみる
+   以下が出力される場合は、しばらくしてから再度実行してみましょう。
 
    ```bash
    $ kubectl top node
-   error: metrics not available yet
+   Error from server (ServiceUnavailable): the server currently unable to handle the request (get node.metrics.k8s.io)
    ```
 
-#### 4.6.2 メトリクスの可視化（未）
+このように metrics-server をデプロイすることで、NodeのCPU/メモリ使用率を監視できるようになります。
+また、`kubectl top pod --use-protocol-buffers -A`を実行するとすべてのPodのCPU/メモリ使用率を監視できます。
 
-SamplerというOSSを用いて、Masterに接続したディスプレイにKuberntesクラスタのメトリクスを表示できるようにする。
+#### 4.6.2 メトリクスの可視化
 
-この手順は
+次に取得したメトリクスを可視化していきます。
+今回は [Sampler](https://github.com/sqshq/sampler) というシェルコマンドの結果を可視化できるツールを使用します。
 
-1. (Master) プロジェクトをクローン
-   @reireias氏が[sampler](https://github.com/sqshq/sampler)プロジェクトをフォークし、Arm用に改変したものを利用する。
+**[4.6.2](#4.6.2 メトリクスの可視化) および [4.6.3](#4.6.3 （おまけ）ディスプレイの設定)、[4.6.4](#4.6.4 （おまけ）samplerの起動時自動実行設定)の手順は、小型ディスプレイをMasterに接続するという前提で進めていきます。**
+小型ディスプレイをWorkerに接続している場合でも、実行するノードを読み替えれば問題なく設定できます。
 
+1. (Master) Samplerのリポジトリをクローン
+   
+   [sqshq/sampler](https://github.com/sqshq/sampler)はRaspberry PiのようなArmアーキテクチャのCPUには対応していないため、@reireias氏がArm用に修正した[reireias/sampler](https://github.com/reireias/sampler) を利用する。
+   
    ```bash
+   $ cd ~/
    $ git clone https://github.com/reireias/sampler.git
    ```
-
+   
 2. (Master) Go言語をインストール
 
+   SamplerをArm用にビルドするためにGo言語をインストールします。
+
    ```bash
-   $ sudo apt install golang
+   $ sudo apt install -y golang
    ```
 
-3. (Master) samplerをビルド
+3. (Master) Arm用のsamplerをビルド
 
    ```bash
    $ cd ~/sampler
    $ GOOS=linux GOARCH=arm GOARM=7 go build
    ```
 
-4. (Master) パスが通っている場所にsamplerを移動
+   ビルドが成功していれば、`sampler` というバイナリが作成されています。
 
    ```bash
-   $ sudo mv ~/sampler/sampler /usr/bin
+   $ ls -l sampler
+   -rwxr-xr-x 1 tarte tarte 4569556 Aug 24 17:50 sampler
+   ```
+
+4. (Master) `sampler`のバイナリをパスが通っている場所に移動
+
+   ```bash
+   # samplerにパスを通す
+   $ sudo mv ~/sampler/sampler /usr/local/bin
+   
+   # パスが通ったことを確認
+   $ sampler --version
+   1.1.0
    ```
 
 5. (Master) samplerの設定ファイルをコピー
 
+   今回使用している設定ファイルでは、各ノードのCPU/メモリ使用率と各種リソースの数、NodePort Serviceの詳細を表示するようになっています。表示されるメトリクスは5秒ごとに更新されます。
+
    ```bash
+   # samplerの設定ファイルディレクトリを作成
    $ sudo mkdir /etc/sampler
+   
+   # samplerの設定ファイルをコピー
    $ cd ~/raspi-k8s-training/manifests/
    $ sudo cp ./4.6/sampler/k8s.yaml /etc/sampler/k8s.yaml
+   
+   # コピーされていること確認
+   $ ls -l /etc/sampler
+   total 4
+   -rw-r--r-- 1 root root 2313 Aug 24 17:57 k8s.yaml
    ```
 
 6. (Master) `sampler`を実行し、表示を確認
@@ -1812,95 +2143,239 @@ SamplerというOSSを用いて、Masterに接続したディスプレイにKube
    $ sampler -c /etc/sampler/k8s.yaml
    ```
 
+   `sampler` は、 `Ctrl+C` もしくは `q` を入力すれば終了します。
 
+7. (Master) resource-consumerをデプロイ
 
-#### 4.6.3 （おまけ）小型ディスプレイへのメトリクスの表示（未）
+   [resource-consumer](https://github.com/kubernetes/kubernetes/tree/master/test/images/resource-consumer) というCPUやメモリに負荷をかけられるコンテナアプリケーションを用いて実際にメトリクスが変動することを確認します。
 
-小型ディスプレイを使用するために、LCDドライバを設定します。本作業は小型ディスプレイを接続するノードのみに実施します。
-
-1. ディスプレイ用のプロジェクトをclone
+   まずは resource-consumer をデプロイします。
 
    ```bash
+   # resource-consumerをデプロイし、NodePortで公開
+   $ cd ~/raspi-k8s-training/manifests
+   $ kubectl apply -f ./4.6/resource-consumer/resource-consumer.yaml
+   pod/resource-consumer created
+   service/resource-consumer created
+   
+   # resoruce-consumerがどのNodeにあるか確認
+   # 以下は実行例であり実際の結果と異なる場合があります
+   $ kubectl get pod resource-consumer -owide | awk '{print $7}'
+   NODE
+   raspi-k8s-worker02
+   ```
+
+8. (Master) resource-consumer にリソースを消費させる
+
+   シェルスクリプトを実行して、 resource-consumer がデプロイされているノードのリソースを消費させます。
+
+   シェルスクリプトでは、resource-consumer に対して以下のように命令しています。
+
+   - 3分間、メモリを2000 MB 消費し続ける
+   - 5分間、CPUを1000 millicores (1 core) 消費し続ける
+
+   ```bash
+   $ cd ~/raspi-k8s-training/manifests
+   # resource-consumerに命令するスクリプトを実行
+   $ bash ./4.6/resource-consumer/putting-load.sh
+   ConsumeMem
+   2000 megabytes
+   180 durationSec
+   ConsumeCPU
+   1000 millicores
+   300 durationSec
+   ```
+
+9. (Master) `sampler`を実行し、メトリクスの推移を確認
+
+   `sampler`を実行してCPU使用率とメモリ使用率の推移を観察します。
+
+   この例では resource-consumer は `raspi-k8s-worker02` Nodeにデプロイされているため、`raspi-k8s-worker02` NodeのCPU使用率とメモリ使用率が変動します。
+
+   Raspberry Pi 4 Model Bは CPUが 40000 millicores (4 cores)、メモリが4000 MB (4 GB)なので、CPU使用率は25%以上、メモリ使用率は50%以上になると思います。
+
+   ```bash
+   $ sampler -c /etc/sampler/k8s.yaml
+   ```
+
+   `sampler` は、 `Ctrl+C` もしくは `q` を入力すれば終了します。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210826190858022.png" alt="image-20210826190858022" style="zoom: 75%;" />
+
+
+
+#### 4.6.3 （おまけ）小型ディスプレイの設定
+
+samplerでメトリクスを可視化することができたので、これを小型ディスプレイに表示できるようにしていきます。
+
+まずは小型ディスプレイを使用するために、LCDドライバを設定します。
+
+**本作業は小型ディスプレイをMasterノードに接続している前提で進めていきます。**
+小型ディスプレイをWorkerに接続している場合でも、実行するノードを読み替えれば問題なく設定できます。
+
+1. (Master) Masterノードと小型ディスプレイを接続
+
+   補足資料「物理層の各種手順」の「小型ディスプレイの接続」を参照して、Masterノードと小型ディスプレイを接続してください。
+   
+2. (Master) ディスプレイドライバのリポジトリをクローン
+
+   ```bash
+   $ cd ~/
    $ git clone https://github.com/kedei/LCD_driver
    ```
 
-   カレントディレクトリに **LCD_driver** が展開されたことを確認
+3. (Master) ディレクトリの権限を変更
 
    ```bash
-   $ ls -l | grep LCD_driver
-   drwxr-xr-x 6 tarte tarte 4096 Aug Jul 29 17:16 LCD_driver
-   ```
+   # ディレクトリの権限を(drwxrwxrwx)に変更
+   $ sudo chmod -R 777 ~/LCD_driver
    
-2. 権限を付与
-
-   ```bash
-   $ sudo chmod -R 777 LCD_driver
-   
-   #権限が(drwxrwxrwx)に変更されたことを確認
+   # 権限が変更されたことを確認
    $ ls -l | grep LCD_driver
-   drwxrwxrwx 6 tarte tarte 4096 Aug Jul 29 17:16 LCD_driver
+   drwxrwxrwx 6 tarte tarte 4096 Aug 24 17:16 LCD_driver
    ```
 
-3. `LCD_driver`ディレクトリに移動
+4. (Master) LCDドライバの設定を変更
+
+   このままだと小型ディスプレイに切り替えた際に、cgroupsのmemoryサブシステムが無効になってしまうので、そうならないようにLCDドライバの設定を変更します。
 
    ```bash
-   $ cd LCD_driver
+   # LCDドライバの設定を変更
+   # memoryサブシステムを有効化する記述を追記
+   $ sed -i "s/$/ cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory/" \
+   ~/LCD_driver/boot/cmdline.txt
+   
+   # 追記できたことを確認
+   $ cat ~/LCD_driver/boot/cmdline.txt
+   dwc_otg.lpm_enable=0 console=tty1 console=ttyAMA0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait fbcon=map:10 fbcon=font:ProFont6x11 log.nologo cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
    ```
 
-4. LCDドライバをインストール
+5. (Master) `LCD_driver`ディレクトリに移動
 
    ```bash
-   $ ./LCD35_show
+   $ cd ~/LCD_driver
    ```
 
-   【補足内容】 
-   LCDドライバインストール後に再起動が実行されます。 
-   インストール後、以下方法でHDMI接続ディスプレイ表示 <==> 3.5インチディスプレイの切替が可能ですが、両ディスプレイを同時には利用できません。  
+6. (Master) 小型ディスプレイに表示を切り替え
 
-   - 3.5インチディスプレイ表示切替
+   以下のコマンドを実行すると再起動が実行されます。
+
+   ```bash
+   $ sudo ./LCD35_show
+   ```
+
+   以下のようなメッセージが表示される場合は、 `y` を入力してください。
+
+   ```bash
+   Do you want to continue? [Y/n]
+   ```
+
+   再起動が完了すると、小型ディスプレイにコマンドラインが表示されているはずです。
+   表示が崩れている場合は、小型ディスプレイを接続し直して再起動してみてください
+
+これで小型ディスプレイにコマンドラインを表示されることができたと思います。
+小型ディスプレイだと表示領域が狭いかもしれませんが、通常のディスプレイと同様に操作可能です。
+
+HDMI接続ディスプレイと小型ディスプレイを切り替えることは可能ですが、両ディスプレイを同時に利用することはできません。
+HDMI接続ディスプレイと小型ディスプレイを切り替えたい場合は以下のコマンドを実行してください。
+
+   - **HDMI接続ディスプレイ → 小型ディスプレイ表示切替**
 
      ```bash
      $ cd ~/LCD_driver
+     # コマンド実行後に再起動され、小型ディスプレイ側で表示されます
      $ sudo ./LCD35_show
-     # コマンド実行後に再起動され、3.5インチディスプレイ側で起動表示されます
      ```
 
-   - HDMIディスプレイ表示切替
+   - **小型ディスプレイ → HDMI接続ディスプレイ表示切替**
 
      ```bash
      $ cd ~/LCD_driver
-     $ sudo ./LCD_hdmi
-     # コマンド実行後に再起動され、HDMIディスプレイ側で起動表示されます
+     # コマンド実行後に再起動され、HDMI接続ディスプレイ側で表示されます
+     $ sudo ./LCD35_hdmi
      ```
 
-#### 4.6.4（おまけ）samplerの起動時自動実行設定（未）
+#### 4.6.4（おまけ）samplerの起動時自動実行設定
 
-1. (Master) 以下のコマンドを実行し、`~/.profile`に追記
+小型ディスプレイを接続したMasterノードが起動した際に、自動的に `sampler` を実行してメトリクスを表示できるようにしていきます。
+
+小型ディスプレイのままでは操作しにくいので、WorkerノードからSSH経由でMasterノードの設定を行っていきます。**今回はWorker01からSSHするという前提で進めます。**
+
+1. (Worker01) キーボードとHDMIケーブルをWorker01に接続
+
+   Worker01のコマンドラインがHDMIディスプレイに表示されること、キーボード入力可能であることを確認して下さい。
+   
+2. (Worker01) SSHでMasterノードにアクセス
 
    ```bash
-   $ echo 'if [ $(tty) == "/dev/tty1" ]; then sampler -c /etc/sampler/k8s.yaml; fi' >> ~/.profile
+   tarte@raspi-k8s-worker01:~ $ ssh tarte@raspi-k8s-master.local
+   tarte@raspi-k8s-master.local's password: <パスワードを入力>
+   Linux raspi-k8s-master 5.10.17-v71+ #1421 SMP Thu May 27 14:00:13 BST 2021 armv71
+   
+   The programs included with the Debian GNU/Linux system are free software;
+   the exact distribution terms for each program are described in the
+   individual files in /usr/share/doc/*/copyright.
+   
+   Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+   permitted by applicable law.
+   Last login: Tue Aug 24 20:09:55 2021
+   
+   tarte@raspi-k8s-master:~ $
    ```
 
-   これでログイン時に自動でsamplerを実行してくれるようになる
-   ただし、ログインは自動化されないので、以降の手順で自動ログインを有効にしていく
-
-2. (Master) `raspi-config`を実行
+   以下のようなメッセージが表示される場合は `yes` を入力してください。
 
    ```bash
-   $ sudo raspi-config
+   Are you sure you want to continue connecting (yes/no)? <yesを入力>
    ```
 
-3. `3 Boot Options`を選択
+   
 
-4. `B1 Desktop / CLI`を選択
+3. (Master) 以下のコマンドを実行し、`~/.profile`に追記
 
-5. `B2 Console Autologin`を選択
+   ```bash
+   $ cd ~/raspi-k8s-training/manifests
+   
+   # 追記内容を確認
+   $ cat ./4.6/sampler/sampler-autoexec
+   if [ $(tty) == "/dev/tty1" ]; then sampler -c /etc/sampler/k8s.yaml; fi
+   
+   # .profileに追記
+   $ cat ./4.6/sampler/sampler-autoexec >> ~/.profile
+   ```
 
-6. `<Finish>`を選択
+   これでログイン後に自動で `sampler` を実行するようになります。
+   `sampler` を自動実行するのは `tty1` でログインしたときのみなので、SSHなどでログインした場合には、`sampler`は自動実行されません。
 
-7. 再起動の確認をされるので、`<Yes>`を選択
+   ただ、ログイン自体は自動化されないので、以降の手順でログインの自動化も行っていきます。
 
-8. Masterに接続されているディスプレイに、samplerが表示されていることを確認
+4. (Master) 自動ログインの有効化
+
+   Masterノード起動時の自動ログインを有効化します。このログインの自動化は `tty1` のときのみ有効なため、SSHなどでログインする場合は引き続き手動でのログインが必要になります。
+
+   1.  `raspi-config`を実行
+
+      ```bash
+      $ sudo raspi-config
+      ```
+
+   2. `1 System Options`を選択
+
+   3. `S5 Boot / Auto Login`を選択
+
+   4. `B2 Console Autologin`を選択
+
+   5. `<Finish>`を選択
+
+   6. 再起動の確認をされるので、`<Yes>`を選択
+
+5. 再起動後に、Masterに接続されているたディスプレイにメトリクスが表示されていることを確認
+
+   SSH経由でMasterノードを操作していたので、Masterノードが再起動されるとプロンプトがWorker01に戻ってきます。
+
+   Masterノードに接続されている小型ディスプレイにメトリクスが表示されていることを確認しましょう。
+
+   <img src="raspi-k8s-training-materials_r1.assets/image-20210826191229173.png" alt="image-20210826191229173" style="zoom: 67%;" />
 
 
 
