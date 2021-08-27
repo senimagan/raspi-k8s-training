@@ -1,23 +1,27 @@
 manifests
- |- 5.1
- |   |- mandatory.yaml # 5.1の手順4でNginx Ingress Controllerを構築するためのマニフェスト(マニフェスト編集済み)
- |   |- ingress-nginx.yaml      # 5.1の手順5で作成・デプロイするNginx Ingress ControllerのNodePort Serviceのマニフェスト
+ |- 4.2
+ |   |- apache-deploy.yaml         # Apacheのマニフェスト
  |
- |- 5.2
- |   |- apache.yaml             # 5.2の手順1で作成・デプロイするApacheのマニフェスト
- |   |- nginx.yaml              # 5.2の手順2で作成・デプロイするNginxのマニフェスト
- |   |- ingress-test.yaml       # 5.2の手順3で作成・デプロイするIngressのマニフェスト
+ |- 4.4
+ |   |- apache.yaml                # Pod退避の時間を変更したApacheのマニフェスト
  |
- |- 6.2
- |   |- metrics-server          # 6.2の手順4でmetrics-serverをデプロイするためのマニフェスト群（deployment.yamlは修正済み）
- |       |- manifests
- |           |- base
- |               |- apiservice.yaml
- |               |- deployment.yaml
- |               |- kustomization.yaml
- |               |- pdb.yaml
- |               |- rbac.yaml
- |               |- service.yaml
+ |- 4.5
+ |   |- apache-clusterip.yaml      # ApacheのClusterIP Serviceのマニフェスト
+ |   |- apache-nodeport.yaml       # ApacheのNodePort Serviceのマニフェスト
+ |   |- apache.yaml                # Apacheのマニフェスト
+ |   |- ingress-path.yaml          # ApacheとNGINXを公開するIngressのマニフェスト
+ |   |- nginx-clusterip.yaml       # NGINXのClusterIP Serviceのマニフェスト
+ |   |- nginx-nodeport.yaml        # NGINXのNodePort Serviceのマニフェスト
+ |   |- nginx.yaml                 # NGINXのマニフェスト
  |
- |- 6.3
-     |- k8s.yaml                # 6.3の手順5で作成するsamplerの設定ファイル
+ |- 4.6
+     |- metrics-server
+     |   |- components.yaml        # metrics-serverのマニフェスト
+     |
+     |- resource-consumer
+     |   |- consume-resources.sh   # リソースを消費させるためのシェルスクリプト
+     |   |- resource-consumer.yaml # resource-consumerのマニフェスト
+     |
+     |- sampler
+         |- k8s.yaml               # samplerの設定ファイル
+         |- sampler-autoexec       # samplerを起動時自動実行するためのコマンド
