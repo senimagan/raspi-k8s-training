@@ -128,3 +128,4 @@ microSDカードは以下の向きに接続してください。
 以下のように画面が発行せず暗いままの場合は、接続に誤りがあるかスイッチがOFFになっているので確認しましょう。
 
 <img src="assemble-raspi-rack.assets/image-20210825204948892.png" alt="image-20210825204948892" style="zoom:60%;" />
+
