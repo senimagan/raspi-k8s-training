@@ -1,4 +1,6 @@
-raspi-k8s-training-materials_r1.pdf
-raspi-k8s-training-materials_r1.html
-physical-layer-procedures.pdf
-physical-layer-procedures.html
+exports
+assemble-raspi-rack.assets
+raspi-k8s-training-materials_r1.assets
+physical-layer-procedures.md
+raspi-k8s-training-materials_r1.md
+troubleshoots.md
