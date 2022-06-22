@@ -7,7 +7,7 @@ metadata:
   name: resource-consumer
 spec:
   containers:
-  - image: gcr.io/k8s-staging-e2e-test-images/resource-consumer:1.10-linux-arm
+  - image: gcr.io/k8s-staging-e2e-test-images/resource-consumer:1.11-linux-arm64
     name: resource-consumer
     ports:
     - containerPort: 8080
