@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: apache-container
-        image: httpd:alpine
+        image: public.ecr.aws/docker/library/httpd:alpine
         ports:
         - containerPort: 80

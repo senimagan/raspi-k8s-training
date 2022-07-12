@@ -4,6 +4,7 @@ metadata:
   name: ingress-path
   namespace: publish-app
 spec:
+  ingressClassName: nginx
   rules:
   - http:
       paths:

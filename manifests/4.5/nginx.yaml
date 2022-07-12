@@ -24,7 +24,7 @@ spec:
         app: nginx
     spec:
       containers:
-      - image: nginx:alpine
+      - image: public.ecr.aws/docker/library/nginx:alpine
         name: nginx
         ports:
         - containerPort: 80
